@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Dashboard — S. Shalabi Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#0A0A0F;--ink2:#14141C;--teal:#00C2A8;--red:#E8412A;--green:#1DB87A;--silver:#F0EEE8;--muted:rgba(255,255,255,.4)}
+body{background:var(--ink);color:var(--silver);font-family:'JetBrains Mono',monospace;min-height:100vh}
+header{background:var(--ink2);padding:16px 36px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.07)}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.hdr-logo{font-family:'Syne',sans-serif;font-size:16px;color:#fff}
+.hdr-tag{font-size:10px;color:var(--muted);background:rgba(255,255,255,.05);padding:2px 8px;border-radius:4px;border:1px solid rgba(255,255,255,.08)}
+.hdr-right{display:flex;gap:12px}
+.hdr-btn{font-size:11px;font-family:'Syne',sans-serif;padding:6px 14px;border-radius:5px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--muted);cursor:pointer;text-decoration:none;transition:all .15s}
+.hdr-btn:hover{color:#fff;border-color:rgba(255,255,255,.25)}
+.hdr-btn.danger{border-color:rgba(232,65,42,.3);color:rgba(232,65,42,.7)}
+.hdr-btn.danger:hover{background:rgba(232,65,42,.08);color:var(--red)}
+
+main{padding:40px 36px;max-width:900px}
+h1{font-family:'Syne',sans-serif;font-size:26px;color:#fff;margin-bottom:6px}
+.sub{font-size:11px;color:var(--muted);margin-bottom:36px;letter-spacing:.4px}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:36px}
+.stat{background:var(--ink2);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:16px}
+.stat-num{font-family:'Syne',sans-serif;font-size:22px;color:#fff}
+.stat-lbl{font-size:9.5px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.8px}
+
+/* Upload card */
+.upload-card{background:var(--ink2);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:28px;margin-bottom:24px}
+.card-title{font-family:'Syne',sans-serif;font-size:16px;color:#fff;margin-bottom:6px}
+.card-desc{font-size:11.5px;color:var(--muted);line-height:1.7;margin-bottom:22px}
+.drop-zone{border:2px dashed rgba(255,255,255,.12);border-radius:8px;padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:18px}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--teal);background:rgba(0,194,168,.04)}
+.drop-icon{font-size:28px;margin-bottom:10px}
+.drop-text{font-size:12px;color:var(--muted);line-height:1.8}
+.drop-text strong{color:var(--teal)}
+#file-input{display:none}
+.file-selected{font-size:11px;color:var(--teal);margin-bottom:14px;display:none;padding:8px 12px;background:rgba(0,194,168,.08);border-radius:5px;border:1px solid rgba(0,194,168,.2)}
+.upload-btn{padding:10px 24px;background:var(--teal);color:var(--ink);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;border:none;border-radius:6px;cursor:pointer;transition:all .15s}
+.upload-btn:hover{background:#009E8A}
+.upload-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Progress / result */
+.progress-wrap{margin-top:18px;display:none}
+.progress-bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.progress-fill{height:100%;background:var(--teal);border-radius:2px;width:0%;transition:width .4s ease}
+.progress-status{font-size:11px;color:var(--muted)}
+.result-box{margin-top:16px;padding:12px 16px;border-radius:7px;font-size:12px;display:none}
+.result-box.ok{background:rgba(29,184,122,.08);border:1px solid rgba(29,184,122,.2);color:#1DB87A}
+.result-box.err{background:rgba(232,65,42,.08);border:1px solid rgba(232,65,42,.2);color:var(--red)}
+
+/* Instructions */
+.instructions{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:20px}
+.instr-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.step{display:flex;gap:12px;margin-bottom:12px;font-size:12px;color:rgba(255,255,255,.6);line-height:1.6}
+.step:last-child{margin-bottom:0}
+.step-num{width:20px;height:20px;border-radius:50%;background:rgba(0,194,168,.15);border:1px solid rgba(0,194,168,.3);color:var(--teal);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-left">
+    <div class="hdr-logo">S. Shalabi · Admin</div>
+    <div class="hdr-tag">Data Management</div>
+  </div>
+  <div class="hdr-right">
+    <a href="/" class="hdr-btn">← Portfolio</a>
+    <a href="/tools/clearpath" class="hdr-btn">ClearPath ↗</a>
+    <a href="/admin/logout" class="hdr-btn danger">Log Out</a>
+  </div>
+</header>
+
+<main>
+  <h1>Database Management</h1>
+  <div class="sub">Upload a new Excel or CSV file to rebuild the provider database · Current: {{ db_size }}</div>
+
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num">{{ stats.get('total', 0) | int | format_number }}</div><div class="stat-lbl">Total Providers</div></div>
+    <div class="stat"><div class="stat-num">{{ stats.get('all5', 0) | int | format_number }}</div><div class="stat-lbl">Full Auth</div></div>
+    <div class="stat"><div class="stat-num">{{ stats.get('hospice', 0) | int | format_number }}</div><div class="stat-lbl">Hospice Eligible</div></div>
+    <div class="stat"><div class="stat-num">{{ db_size }}</div><div class="stat-lbl">DB Size</div></div>
+  </div>
+
+  <div class="upload-card">
+    <div class="card-title">Upload New Provider Data</div>
+    <div class="card-desc">
+      Upload a new <strong>Excel (.xlsx)</strong> or <strong>CSV</strong> file from CMS PECOS to rebuild the database.
+      The app will continue serving the old data until the rebuild is complete. This takes about 12–15 seconds.
+    </div>
+
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
+      <div class="drop-icon">📁</div>
+      <div class="drop-text">
+        <strong>Click to choose file</strong> or drag and drop here<br>
+        Accepted: .xlsx · .xls · .csv
+      </div>
+    </div>
+    <input type="file" id="file-input" accept=".xlsx,.xls,.csv" onchange="onFileSelect(this)">
+    <div class="file-selected" id="file-selected"></div>
+    <button class="upload-btn" id="upload-btn" onclick="doUpload()" disabled>Rebuild Database</button>
+
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="progress-status" id="progress-status">Processing…</div>
+    </div>
+    <div class="result-box" id="result-box"></div>
+  </div>
+
+  <div class="instructions">
+    <div class="instr-title">How to update the data</div>
+    <div class="step"><div class="step-num">1</div><div>Download the latest Order & Referring file from <strong>data.cms.gov</strong> (updated twice weekly)</div></div>
+    <div class="step"><div class="step-num">2</div><div>Drag the downloaded CSV or Excel file into the upload zone above</div></div>
+    <div class="step"><div class="step-num">3</div><div>Click <strong>Rebuild Database</strong> — takes about 12 seconds for 2M rows</div></div>
+    <div class="step"><div class="step-num">4</div><div>ClearPath immediately reflects the new data — no restart needed</div></div>
+  </div>
+</main>
+
+<script>
+let selectedFile = null;
+
+function onDrag(e, over) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.toggle('drag', over);
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f) setFile(f);
+}
+
+function onFileSelect(input) {
+  if (input.files[0]) setFile(input.files[0]);
+}
+
+function setFile(f) {
+  selectedFile = f;
+  const sel = document.getElementById('file-selected');
+  sel.textContent = `✓ Selected: ${f.name} (${(f.size/1024/1024).toFixed(1)} MB)`;
+  sel.style.display = 'block';
+  document.getElementById('upload-btn').disabled = false;
+  document.getElementById('result-box').style.display = 'none';
+}
+
+async function doUpload() {
+  if (!selectedFile) return;
+  const btn    = document.getElementById('upload-btn');
+  const pw     = document.getElementById('progress-wrap');
+  const pf     = document.getElementById('progress-fill');
+  const ps     = document.getElementById('progress-status');
+  const rb     = document.getElementById('result-box');
+
+  btn.disabled = true;
+  pw.style.display = 'block';
+  rb.style.display = 'none';
+
+  // Animate progress bar
+  let prog = 0;
+  const ticker = setInterval(() => {
+    prog = Math.min(prog + Math.random() * 6, 88);
+    pf.style.width = prog + '%';
+  }, 300);
+
+  ps.textContent = 'Uploading file…';
+  const fd = new FormData();
+  fd.append('datafile', selectedFile);
+
+  try {
+    ps.textContent = 'Building DuckDB from file…';
+    const res  = await fetch('/admin/upload', { method: 'POST', body: fd });
+    const data = await res.json();
+
+    clearInterval(ticker);
+    pf.style.width = '100%';
+
+    if (data.success) {
+      ps.textContent = 'Complete!';
+      rb.className = 'result-box ok';
+      rb.textContent = `✓ ${data.message}`;
+      rb.style.display = 'block';
+      // Refresh stats
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      ps.textContent = 'Failed.';
+      rb.className = 'result-box err';
+      rb.textContent = `✗ Error: ${data.error}`;
+      rb.style.display = 'block';
+      btn.disabled = false;
+    }
+  } catch (e) {
+    clearInterval(ticker);
+    ps.textContent = 'Connection error.';
+    rb.className = 'result-box err';
+    rb.textContent = '✗ Server error. Please try again.';
+    rb.style.display = 'block';
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>

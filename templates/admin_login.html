@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Login — S. Shalabi Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0A0A0F;color:#F0EEE8;font-family:'JetBrains Mono',monospace;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.card{background:#14141C;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:40px;width:100%;max-width:380px}
+.card-title{font-family:'Syne',sans-serif;font-size:22px;margin-bottom:6px;color:#fff}
+.card-sub{font-size:11px;color:rgba(255,255,255,.35);margin-bottom:28px;letter-spacing:.5px}
+.flbl{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.fin{width:100%;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:13px;color:#fff;outline:none;transition:border-color .2s;margin-bottom:20px}
+.fin:focus{border-color:#00C2A8}
+.btn{width:100%;padding:11px;background:#00C2A8;color:#0A0A0F;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;border:none;border-radius:6px;cursor:pointer;transition:background .2s}
+.btn:hover{background:#009E8A}
+.flash{background:rgba(232,65,42,.12);border:1px solid rgba(232,65,42,.3);color:#E8412A;font-size:12px;padding:10px 14px;border-radius:6px;margin-bottom:18px}
+.back{display:block;text-align:center;margin-top:18px;font-size:11px;color:rgba(255,255,255,.3);text-decoration:none;transition:color .2s}
+.back:hover{color:#00C2A8}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-title">Admin Access</div>
+  <div class="card-sub">S. SHALABI PORTFOLIO · DATA MANAGEMENT</div>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+    {% endif %}
+  {% endwith %}
+  <form method="POST">
+    <div class="flbl">Password</div>
+    <input class="fin" type="password" name="password" placeholder="Enter admin password" autofocus>
+    <button class="btn" type="submit">Sign In</button>
+  </form>
+  <a href="/" class="back">← Back to Portfolio</a>
+</div>
+</body>
+</html>

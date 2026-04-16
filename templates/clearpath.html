@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ClearPath — S. Shalabi Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0B1F3A;--navy2:#142D52;--navy3:#1C3A66;
+  --teal:#00C2A8;--teal2:#009E8A;
+  --cream:#F5F2EC;--cream2:#EAE6DC;
+  --red:#E8412A;--green:#1DB87A;
+  --txt:#1A1A2E;--muted:#5A6070;--border:rgba(11,31,58,0.12);
+  --fd:'DM Serif Display',Georgia,serif;
+  --fb:'Instrument Sans',sans-serif;
+  --fm:'DM Mono',monospace;
+}
+html,body{height:100%;background:var(--cream);color:var(--txt);font-family:var(--fb);font-size:15px;line-height:1.6}
+.shell{display:grid;grid-template-columns:256px 1fr;grid-template-rows:60px 1fr;height:100vh;overflow:hidden}
+
+/* Topbar */
+.topbar{grid-column:1/-1;background:var(--navy);display:flex;align-items:center;padding:0 22px;gap:10px}
+.back-link{font-family:var(--fm);font-size:11px;color:rgba(255,255,255,0.4);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;flex-shrink:0}
+.back-link:hover{color:var(--teal)}
+.topbar-divider{width:1px;height:18px;background:rgba(255,255,255,0.1);margin:0 4px}
+.logo-mark{width:28px;height:28px;background:var(--teal);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--navy);flex-shrink:0}
+.logo-text{font-family:var(--fd);font-size:18px;color:#fff}
+.logo-text em{color:var(--teal);font-style:normal}
+.topbar-tag{margin-left:6px;font-size:10px;font-family:var(--fm);color:rgba(255,255,255,0.38);background:rgba(255,255,255,0.07);padding:2px 8px;border-radius:4px;border:1px solid rgba(255,255,255,0.1)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.db-pill{display:flex;align-items:center;gap:5px;font-size:11px;font-family:var(--fm);color:rgba(255,255,255,0.45)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.tb-btn{font-size:11.5px;font-family:var(--fb);padding:5px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:rgba(255,255,255,0.65);cursor:pointer;transition:all .15s}
+.tb-btn:hover{background:rgba(255,255,255,0.09);color:#fff}
+.tb-btn.active{background:rgba(0,194,168,0.15);color:var(--teal);border-color:rgba(0,194,168,0.25)}
+
+/* Sidebar */
+.sidebar{background:var(--navy2);padding:18px 14px;display:flex;flex-direction:column;gap:3px;overflow-y:auto;border-right:1px solid rgba(255,255,255,0.05)}
+.sb-sec{font-size:9px;font-family:var(--fm);color:rgba(255,255,255,0.22);text-transform:uppercase;letter-spacing:1.6px;padding:10px 10px 4px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:7px;cursor:pointer;color:rgba(255,255,255,0.58);font-size:13px;transition:all .15s;border:1px solid transparent}
+.sb-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.sb-item.active{background:rgba(0,194,168,0.13);color:var(--teal);border-color:rgba(0,194,168,0.2)}
+.sb-icon{font-size:13px;width:16px;text-align:center}
+.sb-spacer{flex:1}
+.sb-foot{padding:12px 10px;border-top:1px solid rgba(255,255,255,0.06);font-size:10px;color:rgba(255,255,255,0.22);font-family:var(--fm);line-height:1.9}
+.sb-foot .hi{color:rgba(0,194,168,.6)}
+.db-box{margin:10px 0 4px;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;border:1px solid rgba(255,255,255,0.07)}
+.db-box-row{display:flex;justify-content:space-between;font-size:9.5px;font-family:var(--fm);color:rgba(255,255,255,0.35);padding:1.5px 0}
+.db-box-row span:last-child{color:rgba(255,255,255,.5)}
+
+/* Main */
+.main{display:flex;flex-direction:column;overflow:hidden}
+.panel{display:none;flex-direction:column;height:100%;overflow:hidden}
+.panel.active{display:flex}
+
+/* Chat */
+.chat-hdr{padding:16px 26px 13px;border-bottom:1px solid var(--border);background:var(--cream);flex-shrink:0}
+.chat-title{font-family:var(--fd);font-size:20px;color:var(--navy);margin-bottom:2px}
+.chat-sub{font-size:12px;color:var(--muted)}
+.chat-msgs{flex:1;overflow-y:auto;padding:18px 26px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
+.msg{display:flex;gap:10px;animation:up .22s ease}
+@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse}
+.av{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600}
+.av.ai{background:var(--navy);color:var(--teal);font-family:var(--fm)}
+.av.user{background:var(--teal);color:var(--navy)}
+.bbl{max-width:65%;padding:11px 14px;border-radius:12px;font-size:13.5px;line-height:1.65}
+.msg.ai .bbl{background:#fff;border:1px solid var(--border);border-top-left-radius:3px}
+.msg.user .bbl{background:var(--navy);color:#fff;border-top-right-radius:3px}
+.pcard{margin-top:12px;background:var(--cream);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.pcard-top{background:var(--navy);color:#fff;padding:11px 14px;display:flex;align-items:center;justify-content:space-between}
+.pname{font-family:var(--fd);font-size:15px}
+.pnpi{font-family:var(--fm);font-size:9.5px;color:rgba(255,255,255,.42);margin-top:2px}
+.enrolled{font-size:9.5px;font-family:var(--fm);padding:3px 8px;border-radius:20px;background:rgba(29,184,122,.14);color:var(--green);border:1px solid rgba(29,184,122,.3)}
+.auth-grid{display:grid;grid-template-columns:repeat(5,1fr);padding:11px 14px;gap:6px}
+.ai-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 2px;border-radius:7px;border:1px solid var(--border);background:#fff}
+.ai-item.y{border-color:rgba(29,184,122,.28);background:rgba(29,184,122,.05)}
+.ai-item.n{border-color:rgba(232,65,42,.22);background:rgba(232,65,42,.04)}
+.ai-icon{font-size:16px}
+.ai-lbl{font-size:9px;font-family:var(--fm);color:var(--muted);text-align:center;line-height:1.3}
+.ai-val{font-size:9.5px;font-weight:600;font-family:var(--fm)}
+.ai-val.y{color:var(--green)}.ai-val.n{color:var(--red)}
+.risk{margin:0 14px 12px;padding:8px 12px;border-radius:7px;font-size:12px;display:flex;align-items:flex-start;gap:6px}
+.risk.ok{background:rgba(29,184,122,.07);border:1px solid rgba(29,184,122,.2);color:#0B6B44}
+.risk.warn{background:rgba(212,168,71,.09);border:1px solid rgba(212,168,71,.26);color:#7A5C00}
+.typing{padding:9px 13px;display:flex;gap:4px;align-items:center}
+.td{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:tb 1.2s ease infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tb{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+.chips{padding:0 26px 12px;display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:11.5px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:#fff;color:var(--navy);cursor:pointer;transition:all .15s;white-space:nowrap}
+.chip:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.chat-input{padding:12px 26px 16px;border-top:1px solid var(--border);background:var(--cream);flex-shrink:0}
+.irow{display:flex;gap:8px;align-items:flex-end;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:8px 10px 8px 14px;transition:border-color .2s}
+.irow:focus-within{border-color:var(--teal)}
+textarea.ci{flex:1;border:none;outline:none;background:transparent;font-family:var(--fb);font-size:13.5px;color:var(--txt);resize:none;line-height:1.5;min-height:20px;max-height:100px;overflow-y:auto}
+textarea.ci::placeholder{color:#BBB}
+.send{width:32px;height:32px;border-radius:7px;background:var(--navy);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--teal);font-size:15px;transition:all .15s;flex-shrink:0}
+.send:hover{background:var(--teal);color:var(--navy)}
+.send:disabled{opacity:.3;cursor:not-allowed}
+
+/* Lookup */
+.wrap{padding:26px;overflow-y:auto}
+.ptitle{font-family:var(--fd);font-size:23px;color:var(--navy);margin-bottom:4px}
+.psub{font-size:12.5px;color:var(--muted);margin-bottom:22px}
+.lform{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;max-width:500px;margin-bottom:20px}
+.flbl{font-size:10.5px;font-family:var(--fm);color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
+.fin{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-family:var(--fm);font-size:13.5px;background:var(--cream);color:var(--txt);outline:none;transition:border-color .2s;margin-bottom:13px}
+.fin:focus{border-color:var(--teal);background:#fff}
+.lor{text-align:center;font-size:10.5px;color:var(--muted);margin:-5px 0 13px;font-family:var(--fm)}
+.lbtn{padding:9px 24px;background:var(--navy);color:var(--teal);border:none;border-radius:7px;font-family:var(--fb);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s}
+.lbtn:hover{background:var(--teal);color:var(--navy)}
+.nf{padding:16px;text-align:center;color:var(--muted);font-size:13px;background:#fff;border:1px solid var(--border);border-radius:10px}
+
+/* Stats */
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:680px;margin-bottom:24px}
+.scard{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.snum{font-family:var(--fd);font-size:26px;color:var(--navy)}
+.slbl{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--fm)}
+.spct{font-size:10.5px;color:var(--teal);font-family:var(--fm);margin-top:1px}
+.bars-box{max-width:680px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:20px}
+.bars-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:14px}
+.brow{display:flex;align-items:center;gap:11px;margin-bottom:10px}
+.brow:last-child{margin-bottom:0}
+.bname{font-size:11px;font-family:var(--fm);color:var(--muted);width:60px;flex-shrink:0}
+.btrack{flex:1;height:9px;background:var(--cream2);border-radius:5px;overflow:hidden}
+.bfill{height:100%;background:linear-gradient(90deg,var(--navy2),var(--navy3));border-radius:5px;width:0;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.bpct{font-size:11px;font-family:var(--fm);color:var(--txt);width:38px;text-align:right;flex-shrink:0}
+.dl-btn{display:inline-flex;align-items:center;gap:7px;margin-top:18px;padding:9px 18px;background:rgba(0,194,168,.12);color:var(--teal);border:1px solid rgba(0,194,168,.25);border-radius:7px;font-family:var(--fb);font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .15s}
+.dl-btn:hover{background:var(--teal);color:var(--navy)}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:10px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <a href="/" class="back-link">← Portfolio</a>
+    <div class="topbar-divider"></div>
+    <div class="logo-mark">Rx</div>
+    <span class="logo-text">Clear<em>Path</em></span>
+    <span class="topbar-tag">CMS PECOS · Medicare O&R</span>
+    <div class="topbar-right">
+      <div class="db-pill"><div class="dot"></div><span>{{ provider_count }} providers · DuckDB</span></div>
+      <button class="tb-btn active" data-p="chat"   onclick="nav('chat',this)">💬 Assistant</button>
+      <button class="tb-btn"        data-p="lookup" onclick="nav('lookup',this)">🔍 Lookup</button>
+      <button class="tb-btn"        data-p="stats"  onclick="nav('stats',this)">📊 Stats</button>
+    </div>
+  </header>
+
+  <nav class="sidebar">
+    <div class="sb-sec">Workspace</div>
+    <div class="sb-item active" data-p="chat"   onclick="nav('chat',this)"><span class="sb-icon">💬</span>AI Assistant</div>
+    <div class="sb-item"        data-p="lookup" onclick="nav('lookup',this)"><span class="sb-icon">🔍</span>Direct Lookup</div>
+    <div class="sb-item"        data-p="stats"  onclick="nav('stats',this)"><span class="sb-icon">📊</span>Database Stats</div>
+    <div class="sb-spacer"></div>
+    <div class="db-box">
+      <div class="db-box-row"><span>Engine</span><span>DuckDB</span></div>
+      <div class="db-box-row"><span>Source</span><span>CMS PECOS</span></div>
+      <div class="db-box-row"><span>Updated</span><span>Apr 13 2026</span></div>
+    </div>
+    <div class="sb-foot">
+      Providers: <span class="hi">{{ provider_count }}</span><br>
+      United Health Partners<br>
+      Naperville, IL
+    </div>
+  </nav>
+
+  <main class="main">
+    <!-- Chat -->
+    <div class="panel active" id="panel-chat">
+      <div class="chat-hdr">
+        <div class="chat-title">Provider Eligibility Assistant</div>
+        <div class="chat-sub">Ask by NPI · instant DuckDB lookup · AI denial risk analysis</div>
+      </div>
+      <div class="chat-msgs" id="msgs">
+        <div class="msg ai">
+          <div class="av ai">AI</div>
+          <div class="bbl">Hello! I'm <strong>ClearPath</strong> — your Medicare provider eligibility assistant, backed by a live DuckDB database of <strong>{{ provider_count }}</strong> CMS PECOS records.<br><br>Give me any provider's <strong>NPI number</strong> and I'll retrieve their PECOS profile and assess denial risk across all five service categories.</div>
+        </div>
+      </div>
+      <div class="chips" id="chips">
+        <div class="chip" onclick="qs('Can NPI 1497824817 order hospice services?')">🔎 NPI 1497824817</div>
+        <div class="chip" onclick="qs('What can NPI 1679650113 order?')">📋 NPI 1679650113</div>
+        <div class="chip" onclick="qs('Is NPI 1982354767 eligible for Part B?')">⚠️ Part B — 1982354767</div>
+        <div class="chip" onclick="qs('Denial risk for NPI 1760579288?')">🚨 Denial risk — 1760579288</div>
+      </div>
+      <div class="chat-input">
+        <div class="irow">
+          <textarea class="ci" id="ci" rows="1" placeholder="e.g. 'Can NPI 1234567890 order DME?'" onkeydown="hk(event)" oninput="ar(this)"></textarea>
+          <button class="send" id="sbtn" onclick="send()">↑</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lookup -->
+    <div class="panel" id="panel-lookup">
+      <div class="wrap">
+        <div class="ptitle">Direct Provider Lookup</div>
+        <div class="psub">Search the DuckDB provider database by NPI or last name.</div>
+        <div class="lform">
+          <div class="flbl">NPI Number</div>
+          <input class="fin" type="text" id="lnpi" placeholder="e.g. 1497824817" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')">
+          <div class="lor">— or —</div>
+          <div class="flbl">Last Name</div>
+          <input class="fin" type="text" id="lname" placeholder="e.g. SMITH" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')dlookup()">
+          <button class="lbtn" onclick="dlookup()">Look Up Provider</button>
+        </div>
+        <div id="lresult"></div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="panel" id="panel-stats">
+      <div class="wrap">
+        <div class="ptitle">Database Overview</div>
+        <div class="psub">Live summary from DuckDB · CMS PECOS Apr 13, 2026</div>
+        <div class="sgrid" id="sgrid"><div class="scard"><div class="snum">…</div><div class="slbl">Loading</div></div></div>
+        <div class="bars-box"><div class="bars-title">Authorization rates by service type</div><div id="bars"></div></div>
+        <a class="dl-btn" href="/api/download-excel">⬇ Download Excel Summary</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const PANELS=['chat','lookup','stats'];
+function nav(name,el){
+  PANELS.forEach(p=>{document.getElementById('panel-'+p).classList.toggle('active',p===name);});
+  document.querySelectorAll('[data-p]').forEach(e=>e.classList.toggle('active',e.dataset.p===name));
+  if(name==='stats')loadStats();
+}
+const SVC=[
+  {k:'partb',l:'Part B',i:'🧪',d:'Labs/Imaging'},
+  {k:'dme',l:'DME',i:'🦽',d:'Equipment'},
+  {k:'hha',l:'HHA',i:'🏠',d:'Home Health'},
+  {k:'pmd',l:'PMD',i:'⚡',d:'Power Mobility'},
+  {k:'hospice',l:'Hospice',i:'🕊️',d:'End of Life'},
+];
+function buildCard(p){
+  const denials=SVC.filter(s=>!p[s.k]).map(s=>s.l);
+  const items=SVC.map(s=>`<div class="ai-item ${p[s.k]?'y':'n'}"><div class="ai-icon">${s.i}</div><div class="ai-lbl">${s.l}<br><span style="font-size:8px">${s.d}</span></div><div class="ai-val ${p[s.k]?'y':'n'}">${p[s.k]?'✓ YES':'✗ NO'}</div></div>`).join('');
+  const banner=denials.length===0?`<div class="risk ok"><span>✅</span><span>Authorized for all 5 categories. No denial risk.</span></div>`:`<div class="risk warn"><span>⚠️</span><span>Not authorized: <strong>${denials.join(', ')}</strong></span></div>`;
+  const name=[p.first_name,p.last_name].filter(Boolean).join(' ');
+  return `<div class="pcard"><div class="pcard-top"><div><div class="pname">${name}</div><div class="pnpi">NPI: ${p.npi}</div></div><div class="enrolled">● Enrolled</div></div><div class="auth-grid">${items}</div>${banner}</div>`;
+}
+let history=[],waiting=false;
+function addMsg(role,html,card=''){
+  const c=document.getElementById('msgs');
+  const d=document.createElement('div');d.className='msg '+role;
+  d.innerHTML=`<div class="av ${role}">${role==='ai'?'AI':'You'}</div><div class="bbl">${html}${card}</div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+function showTyping(){
+  const c=document.getElementById('msgs');const d=document.createElement('div');
+  d.className='msg ai';d.id='typing';
+  d.innerHTML=`<div class="av ai">AI</div><div class="bbl"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+async function send(){
+  if(waiting)return;
+  const inp=document.getElementById('ci');const msg=inp.value.trim();if(!msg)return;
+  document.getElementById('chips').style.display='none';
+  inp.value='';inp.style.height='';addMsg('user',msg);
+  waiting=true;document.getElementById('sbtn').disabled=true;showTyping();
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history})});
+    const d=await r.json();
+    document.getElementById('typing')?.remove();
+    addMsg('ai',d.reply.replace(/\n/g,'<br>'),d.provider?buildCard(d.provider):'');
+    history.push({role:'user',content:msg});history.push({role:'assistant',content:d.reply});
+  }catch(e){document.getElementById('typing')?.remove();addMsg('ai','Connection error.');}
+  waiting=false;document.getElementById('sbtn').disabled=false;
+}
+function qs(t){document.getElementById('ci').value=t;send();}
+function hk(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
+function ar(el){el.style.height='';el.style.height=Math.min(el.scrollHeight,100)+'px';}
+async function dlookup(){
+  const npi=document.getElementById('lnpi').value.trim();
+  const name=document.getElementById('lname').value.trim();
+  const res=document.getElementById('lresult');
+  res.innerHTML='<div class="nf">Querying DuckDB…</div>';
+  const url=npi?`/api/lookup?npi=${npi}`:`/api/lookup?name=${encodeURIComponent(name)}`;
+  try{
+    const d=await fetch(url).then(r=>r.json());
+    res.innerHTML=d.results&&d.results.length?d.results.map(buildCard).join('<div style="height:8px"></div>'):'<div class="nf">No provider found.</div>';
+  }catch(e){res.innerHTML='<div class="nf">Server error.</div>';}
+}
+let statsLoaded=false;
+async function loadStats(){
+  if(statsLoaded)return;statsLoaded=true;
+  const s=await fetch('/api/stats').then(r=>r.json());
+  const fmt=n=>Number(n).toLocaleString();
+  const pct=(n,t)=>(n/t*100).toFixed(1)+'%';
+  document.getElementById('sgrid').innerHTML=[
+    {l:'Total Providers',n:s.total,p:'100%'},
+    {l:'Full Auth (all 5)',n:s.all5,p:pct(s.all5,s.total)},
+    {l:'Part B',n:s.partb,p:pct(s.partb,s.total)},
+    {l:'DME',n:s.dme,p:pct(s.dme,s.total)},
+    {l:'HHA',n:s.hha,p:pct(s.hha,s.total)},
+    {l:'Hospice',n:s.hospice,p:pct(s.hospice,s.total)},
+  ].map(x=>`<div class="scard"><div class="snum">${fmt(x.n)}</div><div class="slbl">${x.l}</div><div class="spct">${x.p}</div></div>`).join('');
+  const bdata=[{n:'DME',v:s.dme},{n:'Part B',v:s.partb},{n:'HHA',v:s.hha},{n:'PMD',v:s.pmd},{n:'Hospice',v:s.hospice}];
+  document.getElementById('bars').innerHTML=bdata.map(b=>`<div class="brow"><div class="bname">${b.n}</div><div class="btrack"><div class="bfill" data-pct="${(b.v/s.total*100).toFixed(1)}"></div></div><div class="bpct">${(b.v/s.total*100).toFixed(1)}%</div></div>`).join('');
+  requestAnimationFrame(()=>{document.querySelectorAll('.bfill').forEach(el=>{el.style.width=el.dataset.pct+'%';});});
+}
+</script>
+</body>
+</html>

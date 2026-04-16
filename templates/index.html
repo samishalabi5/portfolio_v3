@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Sami Shalabi — Analytics · Quantitative Methods · Trading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300;1,600&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#09090E;--ink2:#111118;--ink3:#181820;
+  --silver:#F2F0EA;--silver2:#D8D5CC;--silver3:#9A9790;
+  --teal:#00BFA6;--gold:#C9A84C;
+  --fp:'Fraunces',Georgia,serif;
+  --fb:'Outfit',sans-serif;
+  --fm:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--silver);font-family:var(--fb);font-size:15px;line-height:1.6;overflow-x:hidden}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 52px;display:flex;align-items:center;justify-content:space-between;background:rgba(9,9,14,0.9);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.04)}
+.nav-logo{font-family:var(--fm);font-size:12px;color:var(--teal);letter-spacing:1.2px}
+.nav-links{display:flex;gap:36px;align-items:center}
+.nav-links a{font-size:12px;font-family:var(--fm);color:var(--silver3);text-decoration:none;letter-spacing:.6px;text-transform:uppercase;transition:color .2s}
+.nav-links a:hover{color:var(--silver)}
+.nav-cta{padding:6px 16px;border:1px solid rgba(0,191,166,0.35);border-radius:4px;color:var(--teal)!important}
+.nav-cta:hover{background:rgba(0,191,166,0.08)!important}
+
+/* Hero */
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 400px;align-items:center;padding:120px 52px 80px;gap:60px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;right:-80px;top:50%;transform:translateY(-50%);width:560px;height:560px;background:radial-gradient(ellipse,rgba(0,191,166,0.06) 0%,transparent 70%);pointer-events:none}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:72px 72px;pointer-events:none}
+.hero-eyebrow{font-family:var(--fm);font-size:10.5px;color:var(--teal);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:22px;display:flex;align-items:center;gap:10px}
+.hero-eyebrow::before{content:'';width:28px;height:1px;background:var(--teal)}
+.hero-name{font-family:var(--fp);font-size:clamp(56px,7vw,86px);font-weight:600;line-height:1.0;color:#fff;margin-bottom:6px;letter-spacing:-1px}
+.hero-name em{font-style:italic;font-weight:300;color:rgba(255,255,255,0.5)}
+.hero-focus{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 28px}
+.ftag{font-family:var(--fm);font-size:10px;padding:4px 12px;border-radius:20px;letter-spacing:.6px;text-transform:uppercase}
+.ftag.hi{background:rgba(0,191,166,0.1);border:1px solid rgba(0,191,166,0.25);color:var(--teal)}
+.ftag.lo{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--silver3)}
+.hero-desc{font-size:15px;color:var(--silver3);line-height:1.85;max-width:520px;margin-bottom:36px;font-weight:300}
+.hero-ctas{display:flex;gap:12px}
+.btn-p{padding:12px 26px;background:var(--teal);color:var(--ink);font-family:var(--fb);font-size:13px;font-weight:600;border:none;border-radius:4px;cursor:pointer;text-decoration:none;transition:all .2s}
+.btn-p:hover{background:#00A894;transform:translateY(-1px)}
+.btn-o{padding:12px 26px;background:transparent;color:var(--silver);font-family:var(--fb);font-size:13px;font-weight:500;border:1px solid rgba(255,255,255,0.15);border-radius:4px;cursor:pointer;text-decoration:none;transition:all .2s}
+.btn-o:hover{border-color:rgba(255,255,255,0.35);color:#fff}
+.hero-right{display:flex;flex-direction:column;gap:13px}
+.hcard{background:var(--ink2);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:18px 20px;position:relative;overflow:hidden}
+.hcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--teal)}
+.hcard-num{font-family:var(--fp);font-size:30px;font-weight:600;color:#fff;line-height:1;margin-bottom:5px}
+.hcard-lbl{font-size:12px;color:var(--silver3);font-weight:300}
+.hcard-sub{font-family:var(--fm);font-size:9px;color:rgba(0,191,166,0.6);margin-top:3px;letter-spacing:.5px}
+
+/* Sections */
+section{padding:96px 52px}
+.sec-tag{font-family:var(--fm);font-size:10px;color:var(--teal);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:14px}
+.sec-title{font-family:var(--fp);font-size:clamp(30px,3.8vw,48px);color:#fff;line-height:1.12;margin-bottom:24px;font-weight:600}
+.sec-title em{font-style:italic;font-weight:300;color:var(--silver3)}
+
+/* About */
+.about{background:var(--ink2);border-top:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05)}
+.about-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:80px;max-width:1100px}
+.about-body{font-size:14.5px;color:var(--silver3);line-height:1.9;font-weight:300}
+.about-body p{margin-bottom:16px}
+.about-body strong{color:var(--silver);font-weight:500}
+.subsec{margin-bottom:26px}
+.subsec-title{font-family:var(--fm);font-size:9.5px;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.skill-wrap{display:flex;flex-wrap:wrap;gap:7px}
+.stag{padding:5px 11px;border-radius:3px;font-family:var(--fm);font-size:10px;letter-spacing:.3px}
+.stag.hi{background:rgba(0,191,166,0.09);border:1px solid rgba(0,191,166,0.2);color:var(--teal)}
+.stag.lo{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:var(--silver3)}
+.course-list{display:flex;flex-direction:column;gap:4px}
+.course{font-size:12px;color:var(--silver3);font-family:var(--fm);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-weight:300}
+
+/* Experience */
+.experience{background:var(--ink)}
+.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:1100px}
+.exp-card{background:var(--ink2);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:28px;transition:border-color .3s;position:relative;overflow:hidden}
+.exp-card:hover{border-color:rgba(0,191,166,0.25)}
+.exp-card.featured{border-color:rgba(0,191,166,0.2);background:linear-gradient(135deg,rgba(0,191,166,0.04) 0%,var(--ink2) 50%)}
+.exp-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--fm);font-size:9px;padding:3px 9px;border-radius:20px;margin-bottom:14px;letter-spacing:.5px;text-transform:uppercase}
+.exp-badge.live{background:rgba(0,191,166,0.1);border:1px solid rgba(0,191,166,0.2);color:var(--teal)}
+.exp-badge.past{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:var(--silver3)}
+.exp-company{font-family:var(--fp);font-size:20px;color:#fff;font-weight:600;margin-bottom:3px}
+.exp-role{font-size:12px;color:var(--teal);font-family:var(--fm);letter-spacing:.4px;margin-bottom:4px}
+.exp-meta{font-size:11px;color:var(--silver3);font-family:var(--fm);margin-bottom:16px;letter-spacing:.3px}
+.exp-desc{font-size:13.5px;color:var(--silver3);line-height:1.8;font-weight:300;margin-bottom:18px}
+.exp-stats{display:flex;flex-wrap:wrap;gap:7px}
+.estat{background:rgba(0,191,166,0.07);border:1px solid rgba(0,191,166,0.15);border-radius:4px;padding:5px 11px;font-family:var(--fm);font-size:10px;color:rgba(0,191,166,0.8);letter-spacing:.4px}
+.exp-link{display:inline-flex;align-items:center;gap:5px;margin-top:14px;font-size:11px;font-family:var(--fm);color:var(--silver3);text-decoration:none;transition:color .2s}
+.exp-link:hover{color:var(--teal)}
+
+/* Community */
+.community{background:var(--ink2);border-top:1px solid rgba(255,255,255,0.05)}
+.comm-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:1100px}
+.comm-card{background:var(--ink3);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:24px}
+.comm-org{font-family:var(--fp);font-size:17px;color:#fff;font-weight:600;margin-bottom:3px}
+.comm-role{font-size:11.5px;color:var(--teal);font-family:var(--fm);letter-spacing:.4px;margin-bottom:12px}
+.comm-body{font-size:13px;color:var(--silver3);line-height:1.8;font-weight:300}
+.comm-nums{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.cnum{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.18);border-radius:4px;padding:5px 11px;font-family:var(--fm);font-size:10px;color:rgba(201,168,76,0.8);letter-spacing:.4px}
+
+/* Tools */
+.tools{background:var(--ink)}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:20px;max-width:1100px}
+.tool-card{background:var(--ink2);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:28px;text-decoration:none;display:block;transition:all .3s;position:relative;overflow:hidden}
+.tool-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,191,166,0.05) 0%,transparent 55%);opacity:0;transition:opacity .3s}
+.tool-card:hover{border-color:rgba(0,191,166,0.3);transform:translateY(-2px)}
+.tool-card:hover::before{opacity:1}
+.tool-card.featured{border-color:rgba(0,191,166,0.22)}
+.tool-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--fm);font-size:9px;padding:3px 9px;border-radius:20px;margin-bottom:14px;letter-spacing:.5px;text-transform:uppercase}
+.tool-badge.live{background:rgba(0,191,166,0.1);border:1px solid rgba(0,191,166,0.2);color:var(--teal)}
+.tool-badge.soon{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:var(--silver3)}
+.tool-name{font-family:var(--fp);font-size:22px;color:#fff;font-weight:600;margin-bottom:8px}
+.tool-desc{font-size:13px;color:var(--silver3);line-height:1.75;margin-bottom:20px;font-weight:300}
+.tool-stack{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.stk{font-family:var(--fm);font-size:9.5px;color:var(--silver3);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);padding:3px 8px;border-radius:3px}
+.tool-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-family:var(--fm);color:var(--teal);text-decoration:none}
+.arr{transition:transform .2s}
+.tool-card:hover .arr{transform:translateX(4px)}
+.tool-link.dim{color:var(--silver3)}
+
+/* Contact */
+.contact{background:var(--ink2);border-top:1px solid rgba(255,255,255,0.05)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;max-width:1100px}
+.contact-body{font-size:14.5px;color:var(--silver3);line-height:1.9;font-weight:300;margin-bottom:32px}
+.contact-links{display:flex;flex-direction:column;gap:10px}
+.clink{display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:6px;font-family:var(--fm);font-size:11.5px;color:var(--silver);text-decoration:none;transition:all .2s;letter-spacing:.3px}
+.clink:hover{border-color:var(--teal);color:var(--teal);background:rgba(0,191,166,0.05)}
+.babson-card{background:var(--ink3);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:24px}
+.babson-school{font-family:var(--fp);font-size:18px;color:#fff;font-weight:600;margin-bottom:3px}
+.babson-deg{font-size:12px;color:var(--teal);font-family:var(--fm);letter-spacing:.3px;margin-bottom:14px}
+.babson-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12.5px}
+.babson-row:last-child{border-bottom:none}
+.babson-key{color:var(--silver3);font-weight:300}
+.babson-val{color:var(--silver);font-family:var(--fm);font-size:11.5px}
+.babson-val.gold{color:var(--gold)}
+
+footer{padding:24px 52px;border-top:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between}
+.foot-l{font-family:var(--fm);font-size:10.5px;color:rgba(255,255,255,0.18);letter-spacing:.5px}
+.foot-r{font-family:var(--fm);font-size:10.5px;color:rgba(255,255,255,0.18)}
+
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease}
+.reveal.visible{opacity:1;transform:none}
+
+@media(max-width:960px){
+  nav{padding:14px 22px}
+  .hero{grid-template-columns:1fr;padding:100px 22px 60px;gap:40px}
+  .hero-right{flex-direction:row;flex-wrap:wrap}
+  .hcard{flex:1;min-width:140px}
+  section{padding:70px 22px}
+  .about-grid,.exp-grid,.comm-grid,.contact-grid{grid-template-columns:1fr}
+  footer{padding:20px 22px;flex-direction:column;gap:6px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">SAMI SHALABI</div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#experience">Experience</a>
+    <a href="#community">Community</a>
+    <a href="#tools">Projects</a>
+    <a href="#contact">Contact</a>
+    <a href="/tools/clearpath" class="nav-cta">Recent Work ↗</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="grid-bg"></div>
+  <div class="hero-left">
+    <div class="hero-eyebrow">Babson College · Class of 2028</div>
+    <h1 class="hero-name">Sami<br><em>Shalabi</em></h1>
+    <div class="hero-focus">
+      <span class="ftag hi">AI</span>
+      <span class="ftag hi">Analytics</span>
+      <span class="ftag hi">Quantitative Methods</span>
+      <span class="ftag lo">Trading</span>
+      <span class="ftag lo">Data Management</span>
+    </div>
+    <p class="hero-desc">
+      Sophomore studying Computational and Mathematical Finance at Babson College.
+      I build data-driven tools and analytical systems at the intersection of
+      quantitative finance, AI, and emerging markets — from electronic trading infrastructure
+      at a Dubai investment bank to blockchain ventures in Hong Kong.
+    </p>
+    <div class="hero-ctas">
+      <a href="#experience" class="btn-p">View Experience</a>
+      <a href="#tools" class="btn-o">Live Projects</a>
+    </div>
+  </div>
+  <div class="hero-right reveal">
+    <div class="hcard">
+      <div class="hcard-num">$28.54B</div>
+      <div class="hcard-lbl">Trades analyzed via Power BI reporting tool</div>
+      <div class="hcard-sub">Arqaam Capital · Electronic Trading &amp; Data — Dubai, UAE</div>
+    </div>
+    <div class="hcard">
+      <div class="hcard-num">22</div>
+      <div class="hcard-lbl">Brokers paired through automated survey system</div>
+      <div class="hcard-sub">Arqaam Capital · Electronic Trading &amp; Data — Dubai, UAE</div>
+    </div>
+    <div class="hcard">
+      <div class="hcard-num">$17K+</div>
+      <div class="hcard-lbl">Funds raised &amp; allocated across campus organizations</div>
+      <div class="hcard-sub">MSA $15K · Tech Society $2K+</div>
+    </div>
+    <div class="hcard">
+      <div class="hcard-num">30+</div>
+      <div class="hcard-lbl">Events planned, budgeted &amp; coordinated on campus</div>
+      <div class="hcard-sub">MSA · Babson Technology Society</div>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section class="about" id="about">
+  <div class="about-grid reveal">
+    <div>
+      <div class="sec-tag">About</div>
+      <h2 class="sec-title">Quantitative<br><em>meets markets</em></h2>
+      <div class="about-body">
+        <p>I'm a sophomore at <strong>Babson College</strong> studying <strong>Computational and Mathematical Finance</strong> — combining rigorous quantitative modeling, statistical methods, and real-world financial decision-making. Dean's List 2025–26.</p>
+        <p>My experience spans emerging market investment banking in Dubai, blockchain venture capital in Hong Kong, and building AI-powered analytics tools from scratch. I'm drawn to problems where data, technology, and finance intersect — and where the right tool can surface insight that wasn't visible before.</p>
+        <p>Native English speaker, professionally proficient in Mandarin, and conversational in Arabic — a useful range across MENA and Asia-Pacific markets.</p>
+      </div>
+    </div>
+    <div>
+      <div class="subsec">
+        <div class="subsec-title">Technical Skills</div>
+        <div class="skill-wrap">
+          <span class="stag hi">Python</span><span class="stag hi">Power BI · DAX</span><span class="stag hi">DuckDB</span><span class="stag hi">SQL · MySQL</span>
+          <span class="stag lo">Pandas · NumPy</span><span class="stag lo">Excel @RISK</span><span class="stag lo">Monte Carlo</span><span class="stag lo">HTML · CSS · JS</span><span class="stag lo">Flask</span><span class="stag lo">Claude AI API</span>
+        </div>
+      </div>
+      <div class="subsec">
+        <div class="subsec-title">Relevant Coursework</div>
+        <div class="course-list">
+          <div class="course">Foundations of Business Analytics</div>
+          <div class="course">Principles of Finance</div>
+          <div class="course">Financial Accounting</div>
+          <div class="course">Risk Management</div>
+          <div class="course">Business Law</div>
+        </div>
+      </div>
+      <div class="subsec">
+        <div class="subsec-title">Languages</div>
+        <div class="skill-wrap">
+          <span class="stag hi">English (native)</span>
+          <span class="stag lo">Mandarin (professional proficiency)</span>
+          <span class="stag lo">Arabic (conversational)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Experience -->
+<section class="experience" id="experience">
+  <div class="sec-tag reveal">Experience</div>
+  <h2 class="sec-title reveal">Where I've<br><em>worked</em></h2>
+  <div class="exp-grid reveal">
+    <div class="exp-card featured">
+      <div class="exp-badge live">● Electronic Trading</div>
+      <div class="exp-company">Arqaam Capital</div>
+      <div class="exp-role">Electronic Trading Intern</div>
+      <div class="exp-meta">Dubai, UAE · Dec 2024 – Jan 2025</div>
+      <div class="exp-desc">
+        Arqaam Capital is a leading full-service investment bank specializing in emerging and frontier markets across the Middle East and Africa, headquartered in the Dubai International Financial Centre (DIFC). Founded in 2004, backed by Emirates NBD and Wafra (Kuwait's sovereign wealth arm), Arqaam operates 10 business lines — cash equity, credit trading, equity derivatives, asset management, and capital markets — covering 280+ listed MEA companies across 26 countries.<br><br>
+        Built a Power BI reporting tool from scratch using DAX to segment and analyze $28.54 billion in recorded trades by client, fund, stock, and instrument. Designed an automated survey system that paired 22 brokers with hundreds of buy-side and sell-side clients — saving hours of manual work and facilitating billions in trade volume.
+      </div>
+      <div class="exp-stats">
+        <span class="estat">$28.54B trades</span>
+        <span class="estat">22 brokers paired</span>
+        <span class="estat">Power BI · DAX</span>
+        <span class="estat">DIFC · Dubai</span>
+      </div>
+      <a href="https://www.arqaamcapital.com" target="_blank" class="exp-link">arqaamcapital.com ↗</a>
+    </div>
+    <div class="exp-card">
+      <div class="exp-badge past">Venture Capital</div>
+      <div class="exp-company">Chiron Group</div>
+      <div class="exp-role">Software Developer</div>
+      <div class="exp-meta">Hong Kong · May – Jul 2022</div>
+      <div class="exp-desc">
+        Chiron is a leading Asian investment group focused on blockchain, digital assets, and emerging technology — backed by executives from Tencent and Pacific Century Group with 10+ years of venture capital experience and 100+ token and equity investments globally across the digital asset ecosystem.<br><br>
+        Applied Excel @RISK Monte Carlo modeling to value a projected VC investment, accelerating deal development. Analyzed six emerging cryptocurrency and Web3 ventures for technical and financial viability, auditing blockchain programs for bugs and structural risk.
+      </div>
+      <div class="exp-stats">
+        <span class="estat">@RISK Monte Carlo</span>
+        <span class="estat">6 Web3 ventures</span>
+        <span class="estat">Blockchain · DeFi</span>
+      </div>
+      <a href="https://chiron.xyz" target="_blank" class="exp-link">chiron.xyz ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- Community -->
+<section class="community" id="community">
+  <div class="sec-tag reveal">Community</div>
+  <h2 class="sec-title reveal">Leadership &amp;<br><em>involvement</em></h2>
+  <div class="comm-grid reveal">
+    <div class="comm-card">
+      <div class="comm-org">Babson Muslim Students Association</div>
+      <div class="comm-role">Treasurer &amp; Vice President · May 2025 – Present</div>
+      <div class="comm-body">Manage and allocate $10,000 in annual funds across 15+ events per semester, requiring strict accounting and budget planning. Coordinate interfaith relations with three other on-campus faith organizations. Plan and execute community events including Jum'uah prayer, Halaqa circles, and Ramadan Iftar.</div>
+      <div class="comm-nums">
+        <span class="cnum">$10K annually</span>
+        <span class="cnum">15+ events/semester</span>
+        <span class="cnum">VP &amp; Treasurer</span>
+      </div>
+    </div>
+    <div class="comm-card">
+      <div class="comm-org">Babson Technology Society</div>
+      <div class="comm-role">Treasurer · September 2025 – Present</div>
+      <div class="comm-body">Budget and manage $2,000+ in allocated funds across four events per semester. Educated 20 students on hardware components — Motherboard to LCD connections, RAM, and system architecture — while dissecting Lenovo Chromebook and ThinkPad devices.</div>
+      <div class="comm-nums">
+        <span class="cnum">$2K+ managed</span>
+        <span class="cnum">4 events/semester</span>
+        <span class="cnum">20 students taught</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Projects -->
+<section class="tools" id="tools">
+  <div class="sec-tag reveal">Projects</div>
+  <h2 class="sec-title reveal">Live analytics<br><em>tools</em></h2>
+  <div class="tools-grid reveal">
+    <a href="/tools/clearpath" class="tool-card featured">
+      <div class="tool-badge live">● Live</div>
+      <div class="tool-name">ClearPath</div>
+      <div class="tool-desc">AI-powered Medicare provider eligibility verification tool. Queries a DuckDB database of {{ provider_count }} CMS PECOS records to surface claim denial risks before submission — natural language interface backed by Claude AI.</div>
+      <div class="tool-stack">
+        <span class="stk">Python</span><span class="stk">DuckDB</span><span class="stk">Flask</span><span class="stk">Claude AI</span><span class="stk">CMS PECOS</span>
+      </div>
+      <span class="tool-link">Launch tool <span class="arr">→</span></span>
+    </a>
+    <div class="tool-card">
+      <div class="tool-badge soon">Coming Soon</div>
+      <div class="tool-name">DenialScan</div>
+      <div class="tool-desc">Batch claim denial risk screener. Upload a CSV of pending claims, cross-reference ordering provider NPIs against PECOS, and receive a denial probability score for each line item before submission.</div>
+      <div class="tool-stack">
+        <span class="stk">Python</span><span class="stk">Pandas</span><span class="stk">DuckDB</span><span class="stk">Flask</span>
+      </div>
+      <span class="tool-link dim">In development</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-badge soon">Coming Soon</div>
+      <div class="tool-name">NetworkGap</div>
+      <div class="tool-desc">Provider network adequacy analyzer. Identifies geographic and specialty gaps in Medicare authorization coverage with interactive D3 choropleth mapping to guide network expansion decisions.</div>
+      <div class="tool-stack">
+        <span class="stk">Python</span><span class="stk">D3.js</span><span class="stk">GeoJSON</span><span class="stk">DuckDB</span>
+      </div>
+      <span class="tool-link dim">In development</span>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="contact" id="contact">
+  <div class="contact-grid reveal">
+    <div>
+      <div class="sec-tag">Contact</div>
+      <h2 class="sec-title">Let's<br><em>connect</em></h2>
+      <p class="contact-body">Based in Wellesley, MA. Open to conversations about quantitative finance, data analytics, AI, and trading systems. Reach out via email or connect on LinkedIn.</p>
+      <div class="contact-links">
+        <a href="mailto:sshalabi1@babson.edu" class="clink"><span>✉</span>sshalabi1@babson.edu</a>
+        <a href="https://www.linkedin.com/in/samishalabi" target="_blank" class="clink"><span>in</span>linkedin.com/in/samishalabi</a>
+        <a href="https://github.com/samishalabi5" target="_blank" class="clink"><span>⌥</span>github.com/samishalabi5</a>
+      </div>
+    </div>
+    <div>
+      <div class="babson-card">
+        <div class="babson-school">Babson College</div>
+        <div class="babson-deg">BS Business Administration · Computational &amp; Mathematical Finance</div>
+        <div class="babson-row"><span class="babson-key">Graduation</span><span class="babson-val">May 2028</span></div>
+        <div class="babson-row"><span class="babson-key">Honors</span><span class="babson-val gold">Dean's List 2025–26</span></div>
+        <div class="babson-row"><span class="babson-key">Location</span><span class="babson-val">Wellesley, MA</span></div>
+        <div class="babson-row"><span class="babson-key">Focus</span><span class="babson-val">Quant Finance · HFT · Data</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-l">© 2026 SAMI SHALABI · BABSON COLLEGE</div>
+  <div class="foot-mid" style="font-family:var(--fm);font-size:10.5px;color:rgba(255,255,255,0.28);letter-spacing:.4px">
+    Authorized to work in the <span style="color:rgba(0,191,166,0.6)">United States</span> &amp; <span style="color:rgba(0,191,166,0.6)">Hong Kong</span>
+  </div>
+  <div class="foot-r">COMPUTATIONAL &amp; MATHEMATICAL FINANCE</div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold:0.08});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
