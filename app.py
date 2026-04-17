@@ -305,23 +305,70 @@ def admin_upload():
     filepath = os.path.join(UPLOAD_FOLDER, filename)
     f.save(filepath)
     try:
-        # Rebuild MediLens DB from uploaded file
-        import pandas as pd
         con = duckdb.connect(DB_PATH)
-        if ext == ".csv":
-            con.execute(f"CREATE OR REPLACE TABLE pecos AS SELECT * FROM read_csv_auto('{filepath}', all_varchar=true)")
+        # Detect which dataset this is by filename or columns
+        fname_lower = filename.lower()
+        if "orderreferring" in fname_lower or "order_and_referring" in fname_lower or "order_referring" in fname_lower:
+            table = "pecos"
+        elif "dme" in fname_lower or "mup_dme" in fname_lower:
+            table = "dme"
+        elif "phy" in fname_lower or "mup_phy" in fname_lower or "prov" in fname_lower:
+            table = "phys"
         else:
-            xl = pd.ExcelFile(filepath)
-            frames = [pd.read_excel(filepath, sheet_name=s, dtype=str).fillna("") for s in xl.sheet_names]
-            combined = pd.concat([df for df in frames if "NPI" in [c.upper() for c in df.columns]], ignore_index=True)
-            combined.columns = [c.upper().strip() for c in combined.columns]
-            con.register("_tmp", combined)
-            con.execute("CREATE OR REPLACE TABLE pecos AS SELECT * FROM _tmp")
-        con.execute("CREATE INDEX IF NOT EXISTS idx_pecos_npi ON pecos(NPI)")
-        count = con.execute("SELECT COUNT(*) FROM pecos").fetchone()[0]
+            # Peek at columns to figure it out
+            import pandas as pd
+            cols = list(pd.read_csv(filepath, nrows=1).columns)
+            cols_upper = [c.upper() for c in cols]
+            if "PARTB" in cols_upper or ("NPI" in cols_upper and "HOSPICE" in cols_upper):
+                table = "pecos"
+            elif "RFRG_NPI" in cols_upper or "DME_TOT_SUPLR_CLMS" in cols_upper:
+                table = "dme"
+            elif "RNDRNG_NPI" in cols_upper:
+                table = "phys"
+            else:
+                table = "pecos"  # default
+
+        con.execute(f"CREATE OR REPLACE TABLE {table} AS SELECT * FROM read_csv_auto('{filepath}', all_varchar=true)")
+
+        # Rebuild indexes and benchmarks if all three tables exist
+        tables_present = [r[0] for r in con.execute("SHOW TABLES").fetchall()]
+        if all(t in tables_present for t in ["pecos","dme","phys"]):
+            con.execute("CREATE INDEX IF NOT EXISTS idx_pecos_npi ON pecos(NPI)")
+            con.execute("CREATE INDEX IF NOT EXISTS idx_dme_npi ON dme(Rfrg_NPI)")
+            con.execute("CREATE INDEX IF NOT EXISTS idx_phys_npi ON phys(Rndrng_NPI)")
+            con.execute("CREATE INDEX IF NOT EXISTS idx_pecos_name ON pecos(LAST_NAME)")
+            con.execute("CREATE INDEX IF NOT EXISTS idx_phys_spec ON phys(Rndrng_Prvdr_Type)")
+            con.execute("""
+                CREATE OR REPLACE TABLE specialty_benchmarks AS
+                SELECT ph.Rndrng_Prvdr_Type as specialty,
+                    COUNT(*) as peer_count,
+                    AVG(TRY_CAST(ph.Tot_Benes AS DOUBLE)) as avg_patients,
+                    AVG(TRY_CAST(ph.Tot_Mdcr_Pymt_Amt AS DOUBLE)) as avg_medicare_payments,
+                    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY TRY_CAST(ph.Tot_Mdcr_Pymt_Amt AS DOUBLE)) as median_medicare_payments,
+                    AVG(TRY_CAST(d.DME_Suplr_Mdcr_Pymt_Amt AS DOUBLE)) as avg_dme_payments,
+                    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY TRY_CAST(d.DME_Suplr_Mdcr_Pymt_Amt AS DOUBLE)) as p75_dme_payments,
+                    PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY TRY_CAST(d.DME_Suplr_Mdcr_Pymt_Amt AS DOUBLE)) as p90_dme_payments,
+                    AVG(TRY_CAST(ph.Bene_Avg_Age AS DOUBLE)) as avg_patient_age,
+                    AVG(TRY_CAST(ph.Bene_CC_PH_Cancer6_V2_Pct AS DOUBLE)) as avg_pct_cancer,
+                    AVG(TRY_CAST(ph.Bene_CC_BH_Alz_NonAlzdem_V2_Pct AS DOUBLE)) as avg_pct_dementia
+                FROM phys ph LEFT JOIN dme d ON ph.Rndrng_NPI = d.Rfrg_NPI
+                WHERE ph.Rndrng_Prvdr_Type IS NOT NULL AND ph.Rndrng_Prvdr_Type != ''
+                GROUP BY ph.Rndrng_Prvdr_Type HAVING COUNT(*) >= 10
+            """)
+            status = "all_ready"
+        else:
+            status = "partial"
+
+        count = con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
         con.close()
         os.remove(filepath)
-        return jsonify({"success":True,"count":count,"message":f"PECOS table rebuilt with {count:,} providers."})
+        msg = f"'{table}' table loaded with {count:,} rows."
+        if status == "all_ready":
+            msg += " All 3 datasets present — database fully built and indexed!"
+        else:
+            remaining = [t for t in ["pecos","dme","phys"] if t not in tables_present]
+            msg += f" Still needed: {', '.join(remaining)}"
+        return jsonify({"success":True,"count":count,"message":msg,"status":status})
     except Exception as e:
         return jsonify({"error":str(e)}), 500
 

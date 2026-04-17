@@ -89,8 +89,10 @@ h1{font-family:'Syne',sans-serif;font-size:26px;color:#fff;margin-bottom:6px}
   <div class="upload-card">
     <div class="card-title">Upload New Provider Data</div>
     <div class="card-desc">
-      Upload a new <strong>Excel (.xlsx)</strong> or <strong>CSV</strong> file from CMS PECOS to rebuild the database.
-      The app will continue serving the old data until the rebuild is complete. This takes about 12–15 seconds.
+      Upload each of the <strong>three CMS source files</strong> one at a time. The app auto-detects which dataset each file is and loads it. Once all three are uploaded, indexes and benchmarks build automatically.<br><br>
+      <strong>1.</strong> <code>OrderReferring_*.csv</code> — PECOS Order &amp; Referring<br>
+      <strong>2.</strong> <code>mup_dme_*.csv</code> — DME by Referring Provider 2023<br>
+      <strong>3.</strong> <code>MUP_PHY_*.csv</code> — Physician &amp; Other Practitioners 2023
     </div>
 
     <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
