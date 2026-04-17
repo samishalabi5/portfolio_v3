@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MediLens — Medicare Provider Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,400&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080E;--bg2:#0E1019;--bg3:#141520;--bg4:#1A1C2A;
+  --silver:#EEECe6;--silver2:#C8C5BC;--silver3:#8A8780;
+  --teal:#00C9B1;--teal2:#009E8E;--gold:#C9A84C;--red:#E04B3A;--green:#1DB87A;
+  --fp:'Fraunces',Georgia,serif;--fb:'Outfit',sans-serif;--fm:'JetBrains Mono',monospace;
+  --border:rgba(255,255,255,0.07);
+}
+html,body{height:100%;background:var(--bg);color:var(--silver);font-family:var(--fb);font-size:14px;line-height:1.6;overflow:hidden}
+.shell{display:grid;grid-template-columns:300px 1fr;grid-template-rows:56px 1fr;height:100vh}
+
+/* Topbar */
+.topbar{grid-column:1/-1;background:var(--bg2);display:flex;align-items:center;padding:0 18px;gap:10px;border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:8px;cursor:pointer}
+.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--teal),var(--teal2));border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:10px;font-weight:500;color:var(--bg)}
+.logo-text{font-family:var(--fp);font-size:17px;color:#fff;font-weight:600}
+.logo-text em{font-style:italic;font-weight:300;color:var(--teal)}
+.topbar-sep{width:1px;height:18px;background:var(--border);margin:0 2px}
+.topbar-tag{font-family:var(--fm);font-size:9.5px;color:var(--silver3);letter-spacing:.6px;text-transform:uppercase}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.tb-tab{font-size:11.5px;font-family:var(--fm);padding:5px 11px;border-radius:5px;border:1px solid transparent;background:transparent;color:var(--silver3);cursor:pointer;transition:all .15s;letter-spacing:.3px}
+.tb-tab:hover{color:var(--silver);border-color:var(--border)}
+.tb-tab.active{background:rgba(0,201,177,0.1);color:var(--teal);border-color:rgba(0,201,177,0.2)}
+.home-btn{padding:5px 11px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--silver3);cursor:pointer;font-size:13px;transition:all .15s;display:flex;align-items:center;gap:5px}
+.home-btn:hover{color:var(--silver);border-color:rgba(255,255,255,0.2)}
+.github-btn{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--silver3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;text-decoration:none;font-size:15px}
+.github-btn:hover{color:#fff;border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.05)}
+.db-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s ease infinite;margin-left:2px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Sidebar */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.search-area{padding:14px 14px 10px}
+.search-label{font-family:var(--fm);font-size:9px;color:var(--silver3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px}
+.search-input{width:100%;padding:8px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;font-family:var(--fm);font-size:12px;color:var(--silver);outline:none;transition:border-color .2s;margin-bottom:7px}
+.search-input:focus{border-color:var(--teal)}
+.search-input::placeholder{color:var(--silver3)}
+select.search-input{cursor:pointer;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238A8780'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.sort-row{display:flex;gap:5px;margin-bottom:7px;flex-wrap:wrap}
+.sort-btn{font-family:var(--fm);font-size:9.5px;padding:4px 9px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--silver3);cursor:pointer;transition:all .15s;letter-spacing:.3px}
+.sort-btn:hover{color:var(--silver);border-color:rgba(255,255,255,.2)}
+.sort-btn.active{background:rgba(0,201,177,0.1);color:var(--teal);border-color:rgba(0,201,177,0.2)}
+.search-btn{width:100%;padding:8px;background:var(--teal);color:var(--bg);font-family:var(--fb);font-size:12px;font-weight:600;border:none;border-radius:6px;cursor:pointer;transition:all .15s}
+.search-btn:hover{background:var(--teal2)}
+.sidebar-divider{height:1px;background:var(--border);margin:6px 14px}
+.sidebar-section{padding:10px 14px 5px;font-family:var(--fm);font-size:9px;color:rgba(255,255,255,.22);text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;justify-content:space-between}
+.result-count{color:rgba(0,201,177,.5);font-size:9px}
+.sidebar-results{flex:1;overflow-y:auto;padding:0 8px 8px}
+.result-item{padding:9px 10px;border-radius:7px;cursor:pointer;transition:background .15s;border:1px solid transparent;margin-bottom:3px}
+.result-item:hover{background:var(--bg3)}
+.result-item.active{background:rgba(0,201,177,0.08);border-color:rgba(0,201,177,0.15)}
+.ri-name{font-weight:500;font-size:12.5px;color:#fff;margin-bottom:2px}
+.ri-meta{font-family:var(--fm);font-size:10px;color:var(--silver3);display:flex;gap:8px;flex-wrap:wrap}
+.ri-npi{color:rgba(0,201,177,0.6)}
+.ri-pay{color:rgba(201,168,76,0.8)}
+.auth-dots{display:flex;gap:3px;margin-top:4px}
+.adot{width:14px;height:14px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:7px;font-family:var(--fm);font-weight:500}
+.adot.y{background:rgba(29,184,122,0.15);color:var(--green);border:1px solid rgba(29,184,122,0.25)}
+.adot.n{background:rgba(224,75,58,0.1);color:var(--red);border:1px solid rgba(224,75,58,0.2)}
+.sidebar-footer{padding:10px 14px;border-top:1px solid var(--border);font-family:var(--fm);font-size:9.5px;color:rgba(255,255,255,.2);line-height:1.8}
+.sidebar-footer .hi{color:rgba(0,201,177,.5)}
+
+/* Main */
+.main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.panel{display:none;flex-direction:column;height:100%;overflow:hidden}
+.panel.active{display:flex}
+
+/* ── Provider Panel ── */
+.provider-panel{flex:1;overflow-y:auto;padding:18px 22px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;text-align:center}
+.empty-icon{font-size:34px;opacity:.3}
+.empty-title{font-family:var(--fp);font-size:20px;color:var(--silver2);font-weight:600}
+.empty-sub{font-size:13px;color:var(--silver3);max-width:320px;line-height:1.7}
+.sample-npis{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:6px}
+.sample-npi{font-family:var(--fm);font-size:11px;padding:5px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--teal);cursor:pointer;transition:all .15s}
+.sample-npi:hover{background:rgba(0,201,177,0.08);border-color:rgba(0,201,177,0.2)}
+
+/* Provider header */
+.prov-header{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.prov-name{font-family:var(--fp);font-size:22px;color:#fff;font-weight:600;line-height:1.1}
+.prov-creds{font-family:var(--fp);font-size:13px;color:var(--silver3);font-style:italic;margin-top:2px}
+.prov-meta{display:flex;gap:12px;margin-top:9px;flex-wrap:wrap}
+.pmeta{font-family:var(--fm);font-size:10px;color:var(--silver3);display:flex;align-items:center;gap:4px}
+.pmeta .val{color:var(--silver);font-weight:500}
+.prov-badges{display:flex;gap:5px;flex-wrap:wrap}
+.pbadge{font-family:var(--fm);font-size:9.5px;padding:3px 9px;border-radius:20px;letter-spacing:.4px}
+.pbadge.enrolled{background:rgba(29,184,122,0.1);border:1px solid rgba(29,184,122,0.2);color:var(--green)}
+.pbadge.specialty{background:rgba(0,201,177,0.08);border:1px solid rgba(0,201,177,0.15);color:var(--teal)}
+.pbadge.warn{background:rgba(224,75,58,0.08);border:1px solid rgba(224,75,58,0.2);color:var(--red)}
+
+/* Clickable metric cards */
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px 15px;position:relative;overflow:hidden;cursor:pointer;transition:all .2s}
+.metric-card:hover{border-color:rgba(0,201,177,0.3);background:rgba(0,201,177,0.04);transform:translateY(-1px)}
+.metric-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--teal);opacity:.5}
+.metric-card.warn::before{background:var(--gold)}
+.metric-card.alert::before{background:var(--red)}
+.metric-card.ok::before{background:var(--green)}
+.metric-card-hint{position:absolute;top:8px;right:10px;font-size:9px;font-family:var(--fm);color:rgba(0,201,177,0.35);letter-spacing:.3px}
+.metric-num{font-family:var(--fp);font-size:21px;color:#fff;font-weight:600;line-height:1}
+.metric-lbl{font-size:11px;color:var(--silver3);margin-top:5px;font-family:var(--fm)}
+.metric-sub{font-size:9.5px;color:rgba(0,201,177,0.6);font-family:var(--fm);margin-top:3px}
+
+/* Auth grid */
+.auth-section{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:14px}
+.section-title{font-family:var(--fm);font-size:9.5px;color:var(--silver3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:11px}
+.auth-row{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.auth-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 5px;border-radius:7px;border:1px solid var(--border);background:var(--bg3)}
+.auth-item.yes{border-color:rgba(29,184,122,0.25);background:rgba(29,184,122,0.04)}
+.auth-item.no{border-color:rgba(224,75,58,0.2);background:rgba(224,75,58,0.03)}
+.auth-icon{font-size:16px}
+.auth-lbl{font-size:9.5px;font-family:var(--fm);color:var(--silver3);text-align:center;line-height:1.3}
+.auth-val{font-size:10px;font-weight:600;font-family:var(--fm)}
+.auth-val.yes{color:var(--green)}.auth-val.no{color:var(--red)}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.info-section{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px}
+.info-row:last-child{border-bottom:none}
+.info-key{color:var(--silver3);font-weight:300}
+.info-val{color:var(--silver);font-family:var(--fm);font-size:11px;text-align:right}
+.info-val.hi{color:var(--teal)}.info-val.warn{color:var(--gold)}.info-val.ok{color:var(--green)}.info-val.bad{color:var(--red)}
+.cond-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.cond-row:last-child{margin-bottom:0}
+.cond-name{font-size:11px;font-family:var(--fm);color:var(--silver3);width:95px;flex-shrink:0}
+.cond-track{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.cond-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--teal),var(--teal2));transition:width .8s cubic-bezier(.4,0,.2,1)}
+.cond-pct{font-size:10.5px;font-family:var(--fm);color:var(--silver);width:30px;text-align:right;flex-shrink:0}
+.peer-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.peer-bar-lbl{font-size:10px;font-family:var(--fm);color:var(--silver3);width:95px;flex-shrink:0}
+.peer-track{flex:1;height:7px;background:var(--bg3);border-radius:4px;position:relative;overflow:visible}
+.peer-avg-mark{position:absolute;top:-3px;bottom:-3px;width:2px;background:rgba(255,255,255,0.2);border-radius:1px}
+.peer-fill{height:100%;border-radius:4px;min-width:2px}
+.peer-fill.above{background:var(--gold)}.peer-fill.below{background:var(--teal)}.peer-fill.neutral{background:var(--teal)}
+.peer-pct{font-size:10px;font-family:var(--fm);width:48px;text-align:right;flex-shrink:0}
+.peer-pct.above{color:var(--gold)}.peer-pct.below{color:var(--teal)}
+
+/* Modal overlay */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:560px;width:90%;max-height:80vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:14px;right:14px;width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--silver3);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.modal-close:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.modal-title{font-family:var(--fp);font-size:18px;color:#fff;font-weight:600;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--silver3);margin-bottom:18px;font-family:var(--fm)}
+.modal-list-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12.5px}
+.modal-list-item:last-child{border-bottom:none}
+.modal-list-rank{font-family:var(--fm);font-size:10px;color:var(--silver3);width:20px}
+.modal-list-name{flex:1;color:var(--silver);padding:0 8px}
+.modal-list-val{font-family:var(--fm);font-size:11.5px;color:var(--teal)}
+.modal-list-npi{font-family:var(--fm);font-size:9.5px;color:var(--silver3);cursor:pointer;padding:2px 7px;border-radius:4px;background:var(--bg3);transition:all .15s;margin-left:6px}
+.modal-list-npi:hover{color:var(--teal);background:rgba(0,201,177,0.08)}
+
+/* ── Chat Panel ── */
+.chat-hdr{padding:13px 20px 11px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2)}
+.chat-title{font-family:var(--fp);font-size:17px;color:#fff;font-weight:600;margin-bottom:1px}
+.chat-sub{font-size:11px;color:var(--silver3)}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 20px;display:flex;flex-direction:column;gap:13px;scroll-behavior:smooth}
+.msg{display:flex;gap:8px;animation:fadeUp .2s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse}
+.av{width:27px;height:27px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600}
+.av.ai{background:var(--bg3);color:var(--teal);font-family:var(--fm);border:1px solid var(--border)}
+.av.user{background:var(--teal);color:var(--bg)}
+.bubble{max-width:70%;padding:10px 13px;border-radius:10px;font-size:13px;line-height:1.65}
+.msg.ai  .bubble{background:var(--bg2);border:1px solid var(--border);border-top-left-radius:3px;color:var(--silver)}
+.msg.user .bubble{background:var(--bg3);color:var(--silver);border:1px solid var(--border);border-top-right-radius:3px}
+.chips-row{padding:0 20px 10px;display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:11.5px;padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);color:var(--silver2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.chip:hover{border-color:var(--teal);color:var(--teal);background:rgba(0,201,177,0.06)}
+.chat-input-area{padding:9px 20px 13px;border-top:1px solid var(--border);flex-shrink:0}
+.irow{display:flex;gap:8px;align-items:flex-end;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:7px 8px 7px 12px;transition:border-color .2s}
+.irow:focus-within{border-color:var(--teal)}
+textarea.ci{flex:1;border:none;outline:none;background:transparent;font-family:var(--fb);font-size:13px;color:var(--silver);resize:none;line-height:1.5;min-height:20px;max-height:90px;overflow-y:auto}
+textarea.ci::placeholder{color:var(--silver3)}
+.send{width:29px;height:29px;border-radius:7px;background:var(--teal);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--bg);font-size:14px;transition:all .15s;flex-shrink:0}
+.send:hover{background:var(--teal2)}.send:disabled{opacity:.3;cursor:not-allowed}
+.td{width:5px;height:5px;border-radius:50%;background:var(--teal);animation:tb 1.2s ease infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tb{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
+
+/* ── Overview Panel ── */
+.overview-panel{flex:1;overflow-y:auto;padding:18px 22px}
+.ov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;max-width:900px;margin-bottom:18px}
+.ov-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.ov-card:hover{border-color:rgba(0,201,177,0.3);background:rgba(0,201,177,0.04);transform:translateY(-1px)}
+.ov-card-hint{position:absolute;bottom:8px;right:10px;font-size:8.5px;font-family:var(--fm);color:rgba(0,201,177,0.3);letter-spacing:.3px}
+.ov-num{font-family:var(--fp);font-size:26px;color:#fff;font-weight:600}
+.ov-lbl{font-size:11px;color:var(--silver3);margin-top:3px;font-family:var(--fm)}
+.ov-sub{font-size:9.5px;color:rgba(0,201,177,.5);font-family:var(--fm);margin-top:2px}
+.spec-table{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;max-width:900px;margin-bottom:18px}
+.spec-title{font-family:var(--fm);font-size:10px;color:var(--silver3);text-transform:uppercase;letter-spacing:1.3px;margin-bottom:12px}
+.spec-row{display:grid;grid-template-columns:190px 1fr 90px 100px;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;cursor:pointer;transition:background .15s;border-radius:4px}
+.spec-row:hover{background:rgba(255,255,255,0.03)}
+.spec-row:last-child{border-bottom:none}
+.spec-row.header{font-family:var(--fm);font-size:9.5px;color:var(--silver3);padding-bottom:7px;cursor:default;pointer-events:none}
+.spec-row.header:hover{background:transparent}
+.spec-name{color:var(--silver)}
+.spec-bar-wrap{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.spec-bar-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal2));border-radius:3px}
+.spec-num{text-align:right;font-family:var(--fm);color:var(--silver3)}
+.spec-num.hi{color:var(--teal)}
+
+/* ── How To Panel ── */
+.howto-panel{flex:1;overflow-y:auto;padding:24px 32px}
+.howto-panel .ht-title{font-family:var(--fp);font-size:28px;color:#fff;font-weight:600;margin-bottom:6px}
+.howto-panel .ht-sub{font-size:13.5px;color:var(--silver3);margin-bottom:30px;max-width:600px;line-height:1.7}
+.ht-section{margin-bottom:28px;max-width:800px}
+.ht-section-title{font-family:var(--fm);font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:1.8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(0,201,177,0.15)}
+.ht-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ht-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.ht-card-title{font-weight:600;font-size:13.5px;color:#fff;margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.ht-card-icon{font-size:15px}
+.ht-card-body{font-size:12.5px;color:var(--silver3);line-height:1.7;font-weight:300}
+.ht-card-body strong{color:var(--silver);font-weight:500}
+.ht-term{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.ht-term:last-child{border-bottom:none}
+.ht-term-name{font-family:var(--fm);font-size:11px;color:var(--teal);width:120px;flex-shrink:0;padding-top:1px}
+.ht-term-def{font-size:12.5px;color:var(--silver3);line-height:1.65;font-weight:300}
+.ht-term-def strong{color:var(--silver);font-weight:500}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:10px}
+
+/* Eligibility filters */
+.elig-filters{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}
+.elig-check{display:flex;align-items:center;gap:4px;cursor:pointer}
+.elig-check input[type=checkbox]{appearance:none;width:13px;height:13px;border:1px solid var(--border);border-radius:3px;background:var(--bg3);cursor:pointer;transition:all .15s;flex-shrink:0;position:relative}
+.elig-check input[type=checkbox]:checked{background:var(--teal);border-color:var(--teal)}
+.elig-check input[type=checkbox]:checked::after{content:'✓';position:absolute;top:-1px;left:1px;font-size:9px;color:var(--bg);font-weight:700}
+.elig-label{font-family:var(--fm);font-size:10px;color:var(--silver3);transition:color .15s}
+.elig-check input:checked + .elig-label{color:var(--teal)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- Topbar -->
+<header class="topbar">
+  <div class="logo" onclick="goHome()">
+    <div class="logo-icon">ML</div>
+    <div class="logo-text">Medi<em>Lens</em></div>
+  </div>
+  <div class="topbar-sep"></div>
+  <a href="/" style="font-family:var(--fm);font-size:11px;color:rgba(255,255,255,0.4);text-decoration:none;display:flex;align-items:center;gap:4px;transition:color .15s;padding:4px 8px;border-radius:5px;border:1px solid rgba(255,255,255,0.07)" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">← Portfolio</a>
+  <div class="topbar-right">
+    <button class="tb-tab active" data-p="provider" onclick="switchPanel('provider',this)">Provider</button>
+    <button class="tb-tab" data-p="chat" onclick="switchPanel('chat',this)">AI Analysis</button>
+    <button class="tb-tab" data-p="overview" onclick="switchPanel('overview',this)">Overview</button>
+    <button class="tb-tab" data-p="howto" onclick="switchPanel('howto',this)">How To</button>
+    <a class="github-btn" href="https://github.com/samishalabi5" target="_blank" title="GitHub">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+    </a>
+    <div class="db-dot"></div>
+  </div>
+</header>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="search-area">
+    <div class="search-label">Search providers</div>
+    <input class="search-input" type="text" id="npi-input" placeholder="NPI (10 digits)" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')" onkeydown="if(event.key==='Enter')doSearch()">
+    <input class="search-input" type="text" id="name-input" placeholder="Last name" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doSearch()">
+    <select class="search-input" id="state-select">
+      <option value="">All states</option>
+      {% for s in states %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+    </select>
+    <div class="search-label" style="margin-top:6px">Medicare eligibility</div>
+    <div class="elig-filters" id="elig-filters">
+      <label class="elig-check"><input type="checkbox" value="PARTB" onchange="updateEligFilters()"><span class="elig-label">Part B</span></label>
+      <label class="elig-check"><input type="checkbox" value="DME" onchange="updateEligFilters()"><span class="elig-label">DME</span></label>
+      <label class="elig-check"><input type="checkbox" value="HHA" onchange="updateEligFilters()"><span class="elig-label">HHA</span></label>
+      <label class="elig-check"><input type="checkbox" value="PMD" onchange="updateEligFilters()"><span class="elig-label">PMD</span></label>
+      <label class="elig-check"><input type="checkbox" value="HOSPICE" onchange="updateEligFilters()"><span class="elig-label">Hospice</span></label>
+    </div>
+    <div class="sort-row" id="sort-row">
+      <span style="font-family:var(--fm);font-size:9px;color:var(--silver3);align-self:center;margin-right:2px">Sort:</span>
+      <button class="sort-btn active" data-sort="name" onclick="setSort('name',this)">Name</button>
+      <button class="sort-btn" data-sort="payments" onclick="setSort('payments',this)">$Medicare</button>
+      <button class="sort-btn" data-sort="dme" onclick="setSort('dme',this)">$DME</button>
+      <button class="sort-btn" data-sort="patients" onclick="setSort('patients',this)">Patients</button>
+      <button class="sort-btn" data-sort="risk" onclick="setSort('risk',this)">Risk</button>
+    </div>
+    <button class="search-btn" onclick="doSearch()">Search</button>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">Results <span class="result-count" id="result-count"></span></div>
+  <div class="sidebar-results" id="sidebar-results">
+    <div style="padding:10px 6px;font-size:11.5px;color:var(--silver3);font-family:var(--fm)">Enter an NPI or search by name, state, or city.</div>
+  </div>
+  <div class="sidebar-footer">
+    PECOS: <span class="hi" id="sf-pecos">—</span><br>
+    DME providers: <span class="hi" id="sf-dme">—</span><br>
+    Physician file: <span class="hi" id="sf-phys">—</span>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- Provider Panel -->
+  <div class="panel active" id="panel-provider">
+    <div class="provider-panel" id="provider-content">
+      <div class="empty-state">
+        <div class="empty-icon">🔬</div>
+        <div class="empty-title">Provider Intelligence</div>
+        <div class="empty-sub">Search for any Medicare provider by NPI, name, state, or city. Click any metric card to explore deeper data.</div>
+        <div class="sample-npis">
+          <div class="sample-npi" onclick="quickLoad('1770572679')">1770572679</div>
+          <div class="sample-npi" onclick="quickLoad('1497824817')">1497824817</div>
+          <div class="sample-npi" onclick="quickLoad('1003000530')">1003000530</div>
+          <div class="sample-npi" onclick="quickLoad('1972569176')">1972569176</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Panel -->
+  <div class="panel" id="panel-chat">
+    <div class="chat-hdr">
+      <div class="chat-title">AI Provider Analysis</div>
+      <div class="chat-sub">Deep analysis across eligibility, billing, DME, and peer benchmarks by NPI</div>
+    </div>
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="msg ai">
+        <div class="av ai">ML</div>
+        <div class="bubble">Hello — I'm MediLens AI. Give me any provider's NPI and I'll analyze their Medicare billing patterns, DME ordering behavior, patient clinical profile, and how they compare to specialty peers across three CMS datasets.</div>
+      </div>
+    </div>
+    <div class="chips-row" id="chat-chips">
+      <div class="chip" onclick="qs('Analyze NPI 1770572679 — any outliers?')">🔍 Analyze 1770572679</div>
+      <div class="chip" onclick="qs('Denial risk profile for NPI 1497824817')">⚠️ Denial risk — 1497824817</div>
+      <div class="chip" onclick="qs('Compare NPI 1972569176 to specialty peers for DME')">📊 Peer compare — 1972569176</div>
+      <div class="chip" onclick="qs('Clinical profile for NPI 1003000530')">🏥 Clinical — 1003000530</div>
+    </div>
+    <div class="chat-input-area">
+      <div class="irow">
+        <textarea class="ci" id="ci" rows="1" placeholder="Ask about any provider by NPI…" onkeydown="hk(event)" oninput="ar(this)"></textarea>
+        <button class="send" id="sbtn" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overview Panel -->
+  <div class="panel" id="panel-overview">
+    <div class="overview-panel">
+      <div class="ov-grid" id="ov-grid">
+        <div class="ov-card"><div class="ov-num">—</div><div class="ov-lbl">Loading...</div></div>
+      </div>
+      <div class="spec-table">
+        <div class="spec-title">Top specialties by DME Medicare payments — 2023 (click row to explore)</div>
+        <div class="spec-row header">
+          <div>Specialty</div><div>Share</div><div style="text-align:right">Providers</div><div style="text-align:right">Total paid</div>
+        </div>
+        <div id="spec-rows"><div style="color:var(--silver3);font-size:12px;padding:8px 0">Loading...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How To Panel -->
+  <div class="panel" id="panel-howto">
+    <div class="howto-panel">
+      <div class="ht-title">How to use MediLens</div>
+      <div class="ht-sub">A plain-English guide to Medicare provider intelligence — what the data means, why it matters, and how to use each feature.</div>
+
+      <div class="ht-section">
+        <div class="ht-section-title">Core Features</div>
+        <div class="ht-grid">
+          <div class="ht-card">
+            <div class="ht-card-title"><span class="ht-card-icon">🔍</span> Provider Search</div>
+            <div class="ht-card-body">Search by <strong>NPI number</strong> for a specific provider, or use <strong>last name + state + city</strong> to browse. Sort results by Medicare payments, DME volume, patient count, or risk score using the sort buttons.</div>
+          </div>
+          <div class="ht-card">
+            <div class="ht-card-title"><span class="ht-card-icon">📊</span> Metric Cards</div>
+            <div class="ht-card-body">Every card on the provider screen is <strong>clickable</strong>. Click Medicare payments to see top earners in that specialty. Click DME payments to see DME rankings. Each card reveals a deeper ranked list.</div>
+          </div>
+          <div class="ht-card">
+            <div class="ht-card-title"><span class="ht-card-icon">🤖</span> AI Analysis</div>
+            <div class="ht-card-body">The AI tab lets you ask natural language questions about any provider. It reads all three datasets and explains billing patterns, flags outliers, and interprets clinical data in plain English.</div>
+          </div>
+          <div class="ht-card">
+            <div class="ht-card-title"><span class="ht-card-icon">📈</span> Overview Dashboard</div>
+            <div class="ht-card-body">See aggregate Medicare statistics — total payments, top specialties by DME volume, hospice coverage rates. Click any overview card to drill into ranked provider lists.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ht-section">
+        <div class="ht-section-title">Key Terms Explained</div>
+        <div class="ht-card" style="max-width:700px">
+          <div class="ht-term">
+            <div class="ht-term-name">NPI</div>
+            <div class="ht-term-def"><strong>National Provider Identifier</strong> — a unique 10-digit ID assigned to every Medicare provider. Think of it as a provider's Social Security number for billing purposes.</div>
+          </div>
+          <div class="ht-term">
+            <div class="ht-term-name">PECOS</div>
+            <div class="ht-term-def"><strong>Provider Enrollment, Chain and Ownership System</strong> — CMS's database of all enrolled Medicare providers and what they're authorized to order. If a provider isn't in PECOS, claims get denied.</div>
+          </div>
+          <div class="ht-term">
+            <div class="ht-term-name">DME</div>
+            <div class="ht-term-def"><strong>Durable Medical Equipment</strong> — medical devices like wheelchairs, oxygen equipment, CPAP machines, and hospital beds. Providers must be specifically authorized to order DME or the claim is denied.</div>
+          </div>
+          <div class="ht-term">
+            <div class="ht-term-name">Part B</div>
+            <div class="ht-term-def">Medicare coverage for <strong>outpatient services</strong> — doctor visits, lab tests, and imaging. Providers must be enrolled to refer for Part B services.</div>
+          </div>
+          <div class="ht-term">
+            <div class="ht-term-name">HHA</div>
+            <div class="ht-term-def"><strong>Home Health Agency</strong> referrals. When a physician certifies that a patient needs home health care, they must be authorized to do so in PECOS.</div>
+          </div>
+          <div class="ht-term">
+            <div class="ht-term-name">Hospice</div>
+            <div class="ht-term-def">End-of-life care certification. Since June 2024, physicians certifying hospice must be enrolled or opted out of Medicare — claims are denied otherwise.</div>
+          </div>
+          <div class="ht-term">
+            <div class="ht-term-name">PMD</div>
+            <div class="ht-term-def"><strong>Power Mobility Devices</strong> — motorized wheelchairs. A subset of DME with its own authorization requirements enforced since April 2014.</div>
+          </div>
+          <div class="ht-term">
+            <div class="ht-term-name">Risk Score</div>
+            <div class="ht-term-def">Average <strong>HCC risk score</strong> of a provider's patient panel. Higher = sicker patients. Useful for context — a high-risk provider billing more isn't necessarily suspicious.</div>
+          </div>
+          <div class="ht-term">
+            <div class="ht-term-name">Peer Benchmark</div>
+            <div class="ht-term-def">How a provider compares to all other providers of the <strong>same specialty</strong>. A DME payment that's +200% above peers in the same specialty may warrant closer review.</div>
+          </div>
+          <div class="ht-term">
+            <div class="ht-term-name">Denial Risk</div>
+            <div class="ht-term-def">When a provider lacks authorization for a service category they're ordering, CMS automatically denies the claim. MediLens flags these mismatches <strong>before submission</strong>.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ht-section">
+        <div class="ht-section-title">Data Sources</div>
+        <div class="ht-grid">
+          <div class="ht-card">
+            <div class="ht-card-title">CMS PECOS Order & Referring</div>
+            <div class="ht-card-body">Updated twice weekly by CMS. Lists all 2M+ Medicare-enrolled providers and their authorization flags. Data as of <strong>April 2026</strong>.</div>
+          </div>
+          <div class="ht-card">
+            <div class="ht-card-title">Medicare DME by Referring Provider</div>
+            <div class="ht-card-body">387K providers who referred at least one DME claim in 2023. Includes payment amounts, claim counts, and patient demographics. Source: <strong>CMS data.cms.gov, 2023</strong>.</div>
+          </div>
+          <div class="ht-card">
+            <div class="ht-card-title">Medicare Physician & Other Practitioners</div>
+            <div class="ht-card-body">1.26M providers with complete 2023 billing activity — services, payments, patient chronic conditions, and risk scores. Source: <strong>CMS data.cms.gov, 2023</strong>.</div>
+          </div>
+          <div class="ht-card">
+            <div class="ht-card-title">How data is joined</div>
+            <div class="ht-card-body">All three datasets are joined on <strong>NPI</strong> in DuckDB, an in-process analytical database. Specialty benchmarks are precomputed across 101 specialty groups for instant peer comparison.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-title" id="modal-title">—</div>
+    <div class="modal-sub" id="modal-sub">—</div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ── State ──
+let chatHistory=[], waiting=false, currentSort='name', currentProvider=null, activeElig=[];
+const AUTH_DEFS=[
+  {k:'partb',l:'Part B',i:'🧪',d:'Labs/Imaging'},
+  {k:'dme_elig',l:'DME',i:'🦽',d:'Equipment'},
+  {k:'hha',l:'HHA',i:'🏠',d:'Home Health'},
+  {k:'pmd',l:'PMD',i:'⚡',d:'Power Mobility'},
+  {k:'hospice',l:'Hospice',i:'🕊️',d:'End of Life'},
+];
+
+// ── Formatting ──
+const fmt=n=>n==null?'—':Number(n).toLocaleString();
+const fmtM=n=>n==null?'—':'$'+(n>=1e9?(n/1e9).toFixed(1)+'B':n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(0)+'K':n.toFixed(0));
+const fmtPct=n=>n==null?'—':Math.round(n)+'%';
+
+// ── Panel switching ──
+function switchPanel(name, el) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tb-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  if(name==='overview') loadOverview();
+}
+
+function goHome() {
+  document.getElementById('provider-content').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">🔬</div>
+      <div class="empty-title">Provider Intelligence</div>
+      <div class="empty-sub">Search for any Medicare provider by NPI, name, state, or city. Click any metric card to explore deeper data.</div>
+      <div class="sample-npis">
+        <div class="sample-npi" onclick="quickLoad('1770572679')">1770572679</div>
+        <div class="sample-npi" onclick="quickLoad('1497824817')">1497824817</div>
+        <div class="sample-npi" onclick="quickLoad('1003000530')">1003000530</div>
+        <div class="sample-npi" onclick="quickLoad('1972569176')">1972569176</div>
+      </div>
+    </div>`;
+  currentProvider = null;
+  document.querySelectorAll('.result-item').forEach(el=>el.classList.remove('active'));
+  switchPanel('provider', document.querySelector('[data-p=provider]'));
+}
+
+// ── Sort ──
+function setSort(s, el) {
+  currentSort = s;
+  document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── Dynamic city dropdown ──
+async function loadCities() {} // removed
+
+// ── Eligibility filter ──
+function updateEligFilters() {
+  activeElig = [...document.querySelectorAll('.elig-check input:checked')].map(el=>el.value);
+}
+
+// ── Search ──
+async function doSearch() {
+  const npi   = document.getElementById('npi-input').value.trim();
+  const name  = document.getElementById('name-input').value.trim();
+  const state = document.getElementById('state-select').value;
+  if (npi) { await loadProvider(npi); return; }
+  const params = new URLSearchParams({sort:currentSort});
+  if (name)  params.set('name', name);
+  if (state) params.set('state', state);
+  const data = await fetch('/api/lookup?'+params).then(r=>r.json());
+  let res = data.results || [];
+  // Client-side eligibility filter
+  if (activeElig.length) {
+    const eligMap = {PARTB:'partb',DME:'dme',HHA:'hha',PMD:'pmd',HOSPICE:'hospice'};
+    res = res.filter(r => activeElig.every(e => r[eligMap[e]]==='Y'));
+  }
+  document.getElementById('result-count').textContent = res.length ? res.length+' found' : '';
+  if (!res.length) {
+    document.getElementById('sidebar-results').innerHTML='<div style="padding:10px 6px;font-size:11.5px;color:var(--silver3);font-family:var(--fm)">No results found.</div>';
+    return;
+  }
+  document.getElementById('sidebar-results').innerHTML = res.map(r=>{
+    const payStr = r.payments ? fmtM(r.payments) : '';
+    return `<div class="result-item" onclick="quickLoad('${r.npi}')">
+      <div class="ri-name">${r.first||''} ${r.last}</div>
+      <div class="ri-meta">
+        <span class="ri-npi">${r.npi}</span>
+        ${r.specialty&&r.specialty!=='—'?`<span>${r.specialty.substring(0,18)}</span>`:''}
+        ${r.state?`<span>${r.city?r.city+', ':''}${r.state}</span>`:''}
+        ${payStr?`<span class="ri-pay">${payStr}</span>`:''}
+      </div>
+      <div class="auth-dots">
+        ${[['B',r.partb],['D',r.dme],['H',r.hha],['P',r.pmd],['Rx',r.hospice]].map(([l,v])=>`<div class="adot ${v==='Y'?'y':'n'}">${l}</div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Provider display ──
+async function loadProvider(npi) {
+  const data = await fetch(`/api/lookup?npi=${npi}`).then(r=>r.json());
+  if (!data.found||!data.result) {
+    document.getElementById('provider-content').innerHTML=`<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-title">Not Found</div><div class="empty-sub">NPI ${npi} not in Medicare PECOS.</div></div>`;
+    return;
+  }
+  currentProvider = data.result;
+  renderProvider(data.result);
+  switchPanel('provider', document.querySelector('[data-p=provider]'));
+  document.querySelectorAll('.result-item').forEach(el=>el.classList.remove('active'));
+}
+
+function quickLoad(npi) { document.getElementById('npi-input').value=npi; loadProvider(npi); }
+
+function renderProvider(p) {
+  const name=[p.first_name,p.last_name].filter(Boolean).join(' ');
+  const b=p.benchmarks||{};
+  const dmeP=parseFloat(p.dme_equip_payments)||0;
+  const avgDme=b.avg_dme_payments||0;
+  const dmeDiff=avgDme>0?((dmeP/avgDme-1)*100):null;
+  const totP=parseFloat(p.total_medicare_payments)||0;
+  const avgTot=b.avg_medicare_payments||0;
+  const totDiff=avgTot>0?((totP/avgTot-1)*100):null;
+  const denials=AUTH_DEFS.filter(a=>p[a.k]!=='Y').map(a=>a.l);
+  const authItems=AUTH_DEFS.map(a=>{const ok=p[a.k]==='Y';return `<div class="auth-item ${ok?'yes':'no'}"><div class="auth-icon">${a.i}</div><div class="auth-lbl">${a.l}<br><span style="font-size:8px">${a.d}</span></div><div class="auth-val ${ok?'yes':'no'}">${ok?'✓ YES':'✗ NO'}</div></div>`;}).join('');
+  const conditions=[{n:'Cancer',v:parseFloat(p.pct_cancer)},{n:'Dementia',v:parseFloat(p.pct_dementia)},{n:'Heart Failure',v:parseFloat(p.pct_heart_failure)},{n:'COPD',v:parseFloat(p.pct_copd)},{n:'Diabetes',v:parseFloat(p.pct_diabetes)},{n:'CKD',v:parseFloat(p.pct_ckd)}].filter(c=>!isNaN(c.v));
+  const maxCond=Math.max(...conditions.map(c=>c.v),1);
+  const condBars=conditions.map(c=>`<div class="cond-row"><div class="cond-name">${c.n}</div><div class="cond-track"><div class="cond-fill" style="width:${Math.min(c.v/maxCond*100,100)}%"></div></div><div class="cond-pct">${Math.round(c.v)}%</div></div>`).join('');
+  const peerRows=[{l:'Medicare payments',pv:totP,av:avgTot,diff:totDiff},{l:'DME payments',pv:dmeP,av:avgDme,diff:dmeDiff},{l:'Avg patient age',pv:parseFloat(p.avg_patient_age),av:b.avg_patient_age,diff:b.avg_patient_age>0?((parseFloat(p.avg_patient_age)/b.avg_patient_age-1)*100):null}].filter(r=>!isNaN(r.pv));
+  const maxPeer=Math.max(...peerRows.map(r=>Math.abs(r.diff||0)),100);
+  const peerBarsHTML=peerRows.map(r=>{const d=r.diff;const cls=d==null?'neutral':Math.abs(d)>20?(d>0?'above':'below'):'neutral';const w=d==null?50:Math.min(Math.abs(d)/maxPeer*80+20,100);return `<div class="peer-bar-row"><div class="peer-bar-lbl">${r.l}</div><div class="peer-track"><div class="peer-fill ${cls}" style="width:${w}%"></div></div><div class="peer-pct ${cls}">${d==null?'N/A':d>0?'+'+Math.round(d)+'%':Math.round(d)+'%'}</div></div>`;}).join('');
+
+  document.getElementById('provider-content').innerHTML=`
+    <div class="prov-header">
+      <div>
+        <div class="prov-name">${name}</div>
+        ${p.credentials?`<div class="prov-creds">${p.credentials}</div>`:''}
+        <div class="prov-meta">
+          <div class="pmeta">NPI <span class="val" style="color:var(--teal)">${p.npi}</span></div>
+          ${p.specialty?`<div class="pmeta">Specialty <span class="val">${p.specialty}</span></div>`:''}
+          ${p.city&&p.state?`<div class="pmeta">Location <span class="val">${p.city}, ${p.state}</span></div>`:''}
+        </div>
+      </div>
+      <div class="prov-badges">
+        <div class="pbadge enrolled">● Enrolled</div>
+        ${p.specialty?`<div class="pbadge specialty">${p.specialty}</div>`:''}
+        ${denials.length>0?`<div class="pbadge warn">⚠ ${denials.length} denial risk${denials.length>1?'s':''}</div>`:''}
+      </div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card ${totDiff!=null&&totDiff>50?'warn':totDiff!=null&&totDiff<-30?'ok':''}" onclick="openMetricModal('payments','${p.specialty||''}','${p.state||''}')">
+        <div class="metric-card-hint">click to explore ↗</div>
+        <div class="metric-num">${fmtM(totP||null)}</div>
+        <div class="metric-lbl">Medicare payments 2023</div>
+        ${totDiff!=null?`<div class="metric-sub">${totDiff>0?'+':''}${Math.round(totDiff)}% vs ${p.specialty||'peers'} avg</div>`:''}
+      </div>
+      <div class="metric-card" onclick="openMetricModal('patients','${p.specialty||''}','${p.state||''}')">
+        <div class="metric-card-hint">click to explore ↗</div>
+        <div class="metric-num">${fmt(parseFloat(p.total_patients)||null)}</div>
+        <div class="metric-lbl">Medicare patients</div>
+        ${b.avg_patients?`<div class="metric-sub">Peer avg: ${fmt(Math.round(b.avg_patients))}</div>`:''}
+      </div>
+      <div class="metric-card ${dmeP>0&&dmeDiff!=null&&dmeDiff>100?'alert':dmeP>0?'warn':''}" onclick="openMetricModal('dme','${p.specialty||''}','${p.state||''}')">
+        <div class="metric-card-hint">click to explore ↗</div>
+        <div class="metric-num">${fmtM(dmeP||null)}</div>
+        <div class="metric-lbl">DME payments 2023</div>
+        ${dmeDiff!=null&&dmeP>0?`<div class="metric-sub">${dmeDiff>0?'+':''}${Math.round(dmeDiff)}% vs specialty avg</div>`:''}
+      </div>
+      <div class="metric-card" onclick="openMetricModal('risk','${p.specialty||''}','${p.state||''}')">
+        <div class="metric-card-hint">click to explore ↗</div>
+        <div class="metric-num">${p.avg_risk_score?parseFloat(p.avg_risk_score).toFixed(2):'—'}</div>
+        <div class="metric-lbl">Avg patient risk score</div>
+        <div class="metric-sub">Higher = sicker patients</div>
+      </div>
+    </div>
+
+    <div class="auth-section">
+      <div class="section-title">Medicare eligibility — PECOS 2026</div>
+      <div class="auth-row">${authItems}</div>
+      ${denials.length>0?`<div style="margin-top:10px;padding:8px 12px;background:rgba(224,75,58,0.07);border:1px solid rgba(224,75,58,0.18);border-radius:6px;font-size:12px;color:rgba(224,75,58,0.9)">⚠ Claims denied if ordering: <strong>${denials.join(', ')}</strong></div>`:'<div style="margin-top:10px;padding:8px 12px;background:rgba(29,184,122,0.06);border:1px solid rgba(29,184,122,0.18);border-radius:6px;font-size:12px;color:var(--green)">✓ Fully authorized — no eligibility-based denial risk</div>'}
+    </div>
+
+    <div class="two-col">
+      <div class="info-section">
+        <div class="section-title">Patient chronic conditions</div>
+        ${condBars||'<div style="color:var(--silver3);font-size:12px">No condition data</div>'}
+      </div>
+      <div class="info-section">
+        <div class="section-title">Peer benchmarks — ${p.specialty||'All'} (n=${fmt(b.peer_count||null)})</div>
+        ${peerBarsHTML||'<div style="color:var(--silver3);font-size:12px">No peer data</div>'}
+        <div style="margin-top:10px;font-size:9.5px;font-family:var(--fm);color:var(--silver3)">Bar = this provider · Mark = specialty avg</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:60px;display:flex;gap:10px">
+      <button onclick="analyzeInChat('${p.npi}')" style="padding:8px 18px;background:rgba(0,201,177,0.1);border:1px solid rgba(0,201,177,0.2);border-radius:7px;color:var(--teal);font-family:var(--fb);font-size:12px;font-weight:500;cursor:pointer">🤖 Analyze with AI →</button>
+    </div>
+  `;
+}
+
+// ── Metric modal ──
+async function openMetricModal(metric, specialty, state) {
+  const metricLabels = {payments:'Top Medicare Earners',dme:'Top DME Orderers',patients:'Most Patients',risk:'Highest Risk Score'};
+  const valLabels = {payments:'Medicare paid',dme:'DME paid',patients:'Patients',risk:'Risk score'};
+  const title = metricLabels[metric] || metric;
+  const sub = specialty ? `${specialty} specialty${state?' · '+state:''}` : 'All specialties';
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-sub').textContent = sub + ' · Top 10 · Click NPI to load provider';
+  document.getElementById('modal-body').innerHTML = '<div style="color:var(--silver3);font-size:12px;padding:8px 0">Loading...</div>';
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  const params = new URLSearchParams({metric});
+  if (state) params.set('state', state);
+  const data = await fetch('/api/top-providers?'+params).then(r=>r.json());
+  const vl = valLabels[metric];
+  document.getElementById('modal-body').innerHTML = data.map((r,i)=>`
+    <div class="modal-list-item">
+      <div class="modal-list-rank">${i+1}</div>
+      <div class="modal-list-name">
+        <span style="color:#fff;font-weight:500">${r.first||''} ${r.last}</span>
+        <span style="color:var(--silver3);font-size:11px"> · ${r.specialty} · ${r.city?r.city+', ':''}${r.state}</span>
+      </div>
+      <div class="modal-list-val">${metric==='risk'?(r.value?r.value.toFixed(2):'—'):fmtM(r.value)}</div>
+      <div class="modal-list-npi" onclick="closeModalDirect();quickLoad('${r.npi}')">${r.npi}</div>
+    </div>`).join('');
+}
+
+function closeModal(e) { if(e.target===document.getElementById('modal-overlay')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modal-overlay').classList.add('hidden'); }
+
+// ── Chat ──
+function addMsg(role,html){
+  const c=document.getElementById('chat-msgs');
+  const d=document.createElement('div');d.className='msg '+role;
+  d.innerHTML=`<div class="av ${role}">${role==='ai'?'ML':'You'}</div><div class="bubble">${html}</div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+function showTyping(){
+  const c=document.getElementById('chat-msgs');const d=document.createElement('div');d.id='typing';d.className='msg ai';
+  d.innerHTML=`<div class="av ai">ML</div><div class="bubble"><div style="display:flex;gap:4px;align-items:center"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+async function sendChat(){
+  if(waiting)return;
+  const inp=document.getElementById('ci');const msg=inp.value.trim();if(!msg)return;
+  document.getElementById('chat-chips').style.display='none';
+  inp.value='';inp.style.height='';addMsg('user',msg);
+  waiting=true;document.getElementById('sbtn').disabled=true;showTyping();
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory})});
+    const d=await r.json();
+    document.getElementById('typing')?.remove();
+    addMsg('ai',d.reply.replace(/\n/g,'<br>'));
+    chatHistory.push({role:'user',content:msg});chatHistory.push({role:'assistant',content:d.reply});
+    if(d.provider){currentProvider=d.provider;renderProvider(d.provider);}
+  }catch(e){document.getElementById('typing')?.remove();addMsg('ai','Connection error. Please try again.');}
+  waiting=false;document.getElementById('sbtn').disabled=false;
+}
+function qs(t){document.getElementById('ci').value=t;sendChat();}
+function hk(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
+function ar(el){el.style.height='';el.style.height=Math.min(el.scrollHeight,90)+'px';}
+function analyzeInChat(npi){switchPanel('chat',document.querySelector('[data-p=chat]'));document.getElementById('ci').value=`Analyze NPI ${npi} — summarize their billing, DME activity, patient panel, and any outliers vs specialty peers.`;sendChat();}
+
+// ── Overview ──
+let ovLoaded=false;
+async function loadOverview(){
+  if(ovLoaded)return;ovLoaded=true;
+  const[stats,specs]=await Promise.all([fetch('/api/stats').then(r=>r.json()),fetch('/api/top-specialties').then(r=>r.json())]);
+  document.getElementById('sf-pecos').textContent=fmt(stats.pecos_total);
+  document.getElementById('sf-dme').textContent=fmt(stats.dme_total);
+  document.getElementById('sf-phys').textContent=fmt(stats.phys_total);
+  document.getElementById('ov-grid').innerHTML=[
+    {n:fmt(stats.pecos_total),l:'PECOS enrolled providers',s:'Medicare Order & Referring 2026',m:'patients'},
+    {n:fmtM(stats.total_dme_payments),l:'Total DME Medicare payments',s:'2023 referring provider claims',m:'dme'},
+    {n:fmtM(stats.total_phys_payments),l:'Total physician Medicare payments',s:'2023 billing activity',m:'payments'},
+    {n:fmt(stats.hospice_eligible)+' ('+Math.round(stats.hospice_eligible/stats.pecos_total*100)+'%)',l:'Providers hospice-eligible',s:'PECOS authorization',m:'risk'},
+    {n:fmt(stats.dme_eligible)+' ('+Math.round(stats.dme_eligible/stats.pecos_total*100)+'%)',l:'Providers DME-eligible',s:'PECOS authorization',m:'dme'},
+    {n:fmt(stats.dme_total),l:'Active DME ordering providers',s:'Had ≥1 DME claim in 2023',m:'dme'},
+  ].map(x=>`<div class="ov-card" onclick="openMetricModal('${x.m}','','')">
+    <div class="ov-card-hint">click to explore ↗</div>
+    <div class="ov-num">${x.n}</div><div class="ov-lbl">${x.l}</div><div class="ov-sub">${x.s}</div>
+  </div>`).join('');
+  const maxPay=Math.max(...specs.map(s=>s.total||0),1);
+  document.getElementById('spec-rows').innerHTML=specs.map(s=>`
+    <div class="spec-row" onclick="openSpecModal('${s.specialty}')">
+      <div class="spec-name">${s.specialty}</div>
+      <div class="spec-bar-wrap"><div class="spec-bar-fill" style="width:${(s.total/maxPay*100).toFixed(1)}%"></div></div>
+      <div class="spec-num">${fmt(s.count)}</div>
+      <div class="spec-num hi">${fmtM(s.total)}</div>
+    </div>`).join('');
+}
+
+async function openSpecModal(specialty) {
+  document.getElementById('modal-title').textContent = specialty + ' — Top DME Orderers';
+  document.getElementById('modal-sub').textContent = 'Highest DME Medicare payments in this specialty · Click NPI to load provider';
+  document.getElementById('modal-body').innerHTML='<div style="color:var(--silver3);font-size:12px;padding:8px 0">Loading...</div>';
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  const data = await fetch('/api/top-providers?metric=dme').then(r=>r.json());
+  const filtered = data.filter(r=>r.specialty===specialty).slice(0,10);
+  document.getElementById('modal-body').innerHTML = (filtered.length?filtered:data.slice(0,10)).map((r,i)=>`
+    <div class="modal-list-item">
+      <div class="modal-list-rank">${i+1}</div>
+      <div class="modal-list-name">
+        <span style="color:#fff;font-weight:500">${r.first||''} ${r.last}</span>
+        <span style="color:var(--silver3);font-size:11px"> · ${r.city?r.city+', ':''}${r.state}</span>
+      </div>
+      <div class="modal-list-val">${fmtM(r.value)}</div>
+      <div class="modal-list-npi" onclick="closeModalDirect();quickLoad('${r.npi}')">${r.npi}</div>
+    </div>`).join('');
+}
+
+// Load stats footer on startup
+fetch('/api/stats').then(r=>r.json()).then(s=>{
+  document.getElementById('sf-pecos').textContent=fmt(s.pecos_total);
+  document.getElementById('sf-dme').textContent=fmt(s.dme_total);
+  document.getElementById('sf-phys').textContent=fmt(s.phys_total);
+});
+</script>
+</body>
+</html>
