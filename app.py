@@ -49,8 +49,9 @@ def safe_int(v):
 
 def lookup_provider(npi):
     if not db_exists(): return None
-    with get_db() as con:
-        row = con.execute("""
+    try:
+        with get_db() as con:
+            row = con.execute("""
             SELECT p.NPI, p.LAST_NAME, p.FIRST_NAME,
                 p.PARTB, p.DME as DME_ELIG, p.HHA, p.PMD, p.HOSPICE,
                 ph.Rndrng_Prvdr_Type, ph.Rndrng_Prvdr_State_Abrvtn, ph.Rndrng_Prvdr_City,
@@ -79,18 +80,23 @@ def lookup_provider(npi):
                 'dme_equip_payments','dme_patients','pos_claims','pos_payments']
         p = dict(zip(cols, row))
         if p.get('specialty'):
-            bench = con.execute("""
-                SELECT peer_count, avg_patients, avg_medicare_payments, median_medicare_payments,
-                       avg_dme_payments, p75_dme_payments, p90_dme_payments,
-                       avg_patient_age, avg_pct_cancer, avg_pct_dementia
-                FROM specialty_benchmarks WHERE specialty = ?
-            """, [p['specialty']]).fetchone()
-            if bench:
-                p['benchmarks'] = dict(zip(['peer_count','avg_patients','avg_medicare_payments',
-                    'median_medicare_payments','avg_dme_payments','p75_dme_payments',
-                    'p90_dme_payments','avg_patient_age','avg_pct_cancer','avg_pct_dementia'],
-                    [safe_float(x) for x in bench]))
+            try:
+                bench = con.execute("""
+                    SELECT peer_count, avg_patients, avg_medicare_payments, median_medicare_payments,
+                           avg_dme_payments, p75_dme_payments, p90_dme_payments,
+                           avg_patient_age, avg_pct_cancer, avg_pct_dementia
+                    FROM specialty_benchmarks WHERE specialty = ?
+                """, [p['specialty']]).fetchone()
+                if bench:
+                    p['benchmarks'] = dict(zip(['peer_count','avg_patients','avg_medicare_payments',
+                        'median_medicare_payments','avg_dme_payments','p75_dme_payments',
+                        'p90_dme_payments','avg_patient_age','avg_pct_cancer','avg_pct_dementia'],
+                        [safe_float(x) for x in bench]))
+            except Exception:
+                pass
         return p
+    except Exception:
+        return None
 
 def search_providers(last='', state='', sort_by='name', limit=20):
     conditions, params = [], []
@@ -137,18 +143,22 @@ def get_states():
 
 def get_overview_stats():
     if not db_exists(): return {}
-    with get_db() as con:
-        r = con.execute("""SELECT
-            (SELECT COUNT(*) FROM pecos),
-            (SELECT COUNT(*) FROM dme),
-            (SELECT COUNT(*) FROM phys),
-            (SELECT SUM(TRY_CAST(Suplr_Mdcr_Pymt_Amt AS DOUBLE)) FROM dme),
-            (SELECT SUM(TRY_CAST(Tot_Mdcr_Pymt_Amt AS DOUBLE)) FROM phys),
-            (SELECT COUNT(*) FROM pecos WHERE HOSPICE='Y'),
-            (SELECT COUNT(*) FROM pecos WHERE DME='Y')""").fetchone()
-    return {'pecos_total':safe_int(r[0]),'dme_total':safe_int(r[1]),'phys_total':safe_int(r[2]),
-            'total_dme_payments':safe_float(r[3]),'total_phys_payments':safe_float(r[4]),
-            'hospice_eligible':safe_int(r[5]),'dme_eligible':safe_int(r[6])}
+    try:
+        with get_db() as con:
+            tables = [r[0] for r in con.execute("SHOW TABLES").fetchall()]
+            pecos_count = con.execute("SELECT COUNT(*) FROM pecos").fetchone()[0] if "pecos" in tables else 0
+            dme_count   = con.execute("SELECT COUNT(*) FROM dme").fetchone()[0] if "dme" in tables else 0
+            phys_count  = con.execute("SELECT COUNT(*) FROM phys").fetchone()[0] if "phys" in tables else 0
+            dme_pay  = con.execute("SELECT SUM(TRY_CAST(Suplr_Mdcr_Pymt_Amt AS DOUBLE)) FROM dme").fetchone()[0] if "dme" in tables else 0
+            phys_pay = con.execute("SELECT SUM(TRY_CAST(Tot_Mdcr_Pymt_Amt AS DOUBLE)) FROM phys").fetchone()[0] if "phys" in tables else 0
+            hosp = con.execute("SELECT COUNT(*) FROM pecos WHERE HOSPICE='Y'").fetchone()[0] if "pecos" in tables else 0
+            dme_e = con.execute("SELECT COUNT(*) FROM pecos WHERE DME='Y'").fetchone()[0] if "pecos" in tables else 0
+        return {'pecos_total':safe_int(pecos_count),'dme_total':safe_int(dme_count),
+                'phys_total':safe_int(phys_count),'total_dme_payments':safe_float(dme_pay),
+                'total_phys_payments':safe_float(phys_pay),'hospice_eligible':safe_int(hosp),
+                'dme_eligible':safe_int(dme_e)}
+    except Exception:
+        return {}
 
 def get_top_dme_specialties():
     if not db_exists(): return []
